@@ -23,9 +23,9 @@
 	</licenses>
 
 	<scm>
-		<url></url>
-		<connection>scm:git:git://oglimmer.de/scg.git</connection>
-		<developerConnection>scm:git:git@oglimmer.de/scg.git</developerConnection>
+    	<url>https://github.com/oglimmer/scg</url>
+    	<connection>scm:git:git://github.com/oglimmer/scg.git</connection>
+    	<developerConnection>scm:git:git@github.com:oglimmer/scg.git</developerConnection>
 	</scm>
 
 	<properties>
