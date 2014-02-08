@@ -1,0 +1,24 @@
+card1.name=Target
+card1.desc=Target a player and name a non-Target card. If the target player has that card, he is out of the round.
+
+card2.name=Spy
+card2.desc=Look at target player's hand.
+
+card3.name=Fight
+card3.desc=Secretly compare hands with target player. The player with the lowest rank is out of the round.
+
+card4.name=Protect
+card4.desc=Until your next turn, ignore all effects that target you.
+
+card5.name=Replace
+card5.desc=Target any player, including yourself. That player discards his hand and draws a new card from the deck.
+
+card6.name=Change
+card6.desc=Change hands with target player.
+
+card7.name=High Val
+card7.desc=If your other card is either Change or Replace our must play this card.
+
+card8.name=Win
+card8.desc=If you discard this card, you are out of the round.
+
