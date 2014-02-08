@@ -1,0 +1,4 @@
+scg
+===
+
+Simple Card Game
