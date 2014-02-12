@@ -26,11 +26,7 @@ public abstract class Card implements Serializable {
 		this.no = no;
 	}
 
-	public abstract boolean playImpl(Integer param1, Integer param2);
-
-	final public boolean play(Integer param1, Integer param2) {
-		return playImpl(param1, param2);
-	}
+	public abstract void play(Integer targetPlayerNo, Integer targetCardNo);
 
 	public String getName() {
 		return Theme.INSTANCE.getName(no);
@@ -40,12 +36,8 @@ public abstract class Card implements Serializable {
 		return Theme.INSTANCE.getDesc(no);
 	}
 
-	public int getNo() {
-		return no;
-	}
-
 	public void discard(Runnable onSuccess) {
-		owner.getCardHand().removeCard(this, true);
+		owner.getCardHand().removeCardAndAddToOpenStack(this);
 		onSuccess.run();
 	}
 
@@ -65,15 +57,23 @@ public abstract class Card implements Serializable {
 	}
 
 	/**
-	 * True if the target player param1 is at the moment valid for this card. The card may ignore param1 at all, in this
-	 * case it must return true.
+	 * True if the target player targetPlayerNo is at the moment valid for this card. The card may ignore targetPlayerNo
+	 * at all, in this case it must return true.
 	 * 
 	 * @param game
-	 * @param param1
+	 * @param targetPlayerNo
 	 * @return
 	 */
-	public boolean isTargetValid(Integer param1) {
+	public boolean isTargetValid(Integer targetPlayerNo) {
 		return true;
+	}
+
+	public boolean isProtectsOwner() {
+		return false;
+	}
+
+	public boolean isEnduring() {
+		return false;
 	}
 
 }

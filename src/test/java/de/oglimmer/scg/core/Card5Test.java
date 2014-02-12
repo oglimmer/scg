@@ -26,10 +26,11 @@ public class Card5Test {
 		a.getCardHand().addCard(Card.get(5), Type.DRAWN);
 
 		Iterator<Player> it = game.getPlayers().iterator();
-		game.setPlayerIterator(it);
-		game.setCurrentPlayer(it.next());
+		game.getTurn().setPlayerIterator(it);
+		game.getTurn().setCurrentPlayer(it.next());
 
-		boolean playResult = game.play(new String[] { "2", "1" });
+		Play play = game.getTurn().getPlay(new String[] { "2", "1" });
+		boolean playResult = play.play();
 
 		assertThat(playResult, is(true));
 		assertThat(a, isAlive());

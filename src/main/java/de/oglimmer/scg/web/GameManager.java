@@ -2,6 +2,7 @@ package de.oglimmer.scg.web;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Collection;
@@ -27,7 +28,7 @@ public enum GameManager {
 		return games.get(id);
 	}
 
-	public void removeGame(Game game) {
+	public void removeGameMemoryAndFile(Game game) {
 		games.remove(game.getId());
 		new File(game.getBackupFilename()).delete();
 	}
@@ -46,4 +47,18 @@ public enum GameManager {
 
 	}
 
+	public void restoreSavedGames() {
+		File backupDir = new File(ScgProperties.INSTANCE.getBackupDir());
+		File[] listFiles = backupDir.listFiles(new _FilenameFilter());
+		for (File file : listFiles) {
+			loadGame(file);
+		}
+	}
+
+	class _FilenameFilter implements FilenameFilter {
+		@Override
+		public boolean accept(File dir, String name) {
+			return name.endsWith(".scg");
+		}
+	};
 }

@@ -26,4 +26,24 @@ public class CardStack implements Serializable {
 		return cards.remove(0);
 	}
 
+	public void init() {
+		add(Card.get(8));
+		add(Card.get(7));
+		add(Card.get(6));
+		add(Card.get(5));
+		add(Card.get(5));
+		add(Card.get(4));
+		add(Card.get(4));
+		add(Card.get(3));
+		add(Card.get(3));
+		add(Card.get(2));
+		add(Card.get(2));
+		add(Card.get(1));
+		add(Card.get(1));
+		add(Card.get(1));
+		add(Card.get(1));
+		add(Card.get(1));
+		shuffle();
+	}
+
 }

@@ -20,26 +20,8 @@ public class Card6 extends TargetableCard {
 	}
 
 	@Override
-	public boolean playOnTarget(Player otherPlayer, Integer param2) {
-
-		Card otherAc = otherPlayer.getCardHand().removeCard(Type.HAND, false);
-
-		AssociatedCard myAc = getOwner().getCardHand().getOwnerOtherAssociatedCard(this);
-
-		getOwner().getCardHand().removeCard(myAc.getCard(), false);
-
-		otherPlayer.getCardHand().addCard(myAc.getCard(), Type.HAND);
-		getOwner().getCardHand().addCard(otherAc, Type.HAND);
-
-		addMsg(getOwner(), otherPlayer, myAc.getCard(), otherAc);
-
-		log.debug("Card 6: Player {} got {}, player {} got {}", getOwner(), otherAc, otherAc, myAc);
-		return true;
-	}
-
-	@Override
-	public int getNo() {
-		return 6;
+	public void playOnTarget(Player targetPlayer, Integer targetCardNo) {
+		new Swap(targetPlayer).swap();
 	}
 
 	@Override
@@ -47,14 +29,57 @@ public class Card6 extends TargetableCard {
 		return !getOwner().getCardHand().hasCard(7);
 	}
 
-	private void addMsg(Player player, Player otherPlayer, Card playersCard, Card otherPlayersCard) {
-		Messages.addTo("You have played " + getName() + " against " + otherPlayer.getDisplayName() + ". You got "
-				+ otherPlayersCard.getName() + " for " + playersCard.getName(), player);
-		Messages.addTo("Player " + player.getDisplayName() + " played " + getName() + " against you. You gave away "
-				+ otherPlayersCard.getName() + " and just got " + playersCard.getName(), otherPlayer);
-		Messages.addNotTo(
-				"Player " + player.getDisplayName() + " played " + getName() + " against "
-						+ otherPlayer.getDisplayName() + ".", player, otherPlayer);
+	class Swap {
+
+		private final Player targetPlayer;
+		private final Card targetPlayersHandCard;
+		private final Card playersOtherCard;
+
+		public Swap(Player targetPlayer) {
+			this.targetPlayer = targetPlayer;
+			targetPlayersHandCard = getTargetPlayersHandCard();
+			playersOtherCard = getPlayersOtherCard();
+		}
+
+		private void swap() {
+			removeCards();
+			addCards();
+			addMsg();
+			log.debug("Card 6: Player {} got {}, player {} got {}", getOwner(), targetPlayersHandCard,
+					targetPlayersHandCard, playersOtherCard);
+		}
+
+		private void addCards() {
+			targetPlayer.getCardHand().addCard(playersOtherCard, Type.HAND);
+			getOwner().getCardHand().addCard(targetPlayersHandCard, Type.HAND);
+		}
+
+		private void removeCards() {
+			getOwner().getCardHand().removeCard(playersOtherCard);
+			targetPlayer.getCardHand().removeCard(targetPlayersHandCard);
+		}
+
+		private Card getPlayersOtherCard() {
+			Card playersOtherCard = getOwner().getCardHand().getOwnerOtherCard(Card6.this);
+			return playersOtherCard;
+		}
+
+		private Card getTargetPlayersHandCard() {
+			return targetPlayer.getCardHand().getCard(Type.HAND);
+		}
+
+		private void addMsg() {
+			String msgPlayer = String.format("You have played %s against %s. You got %s for %s.", getName(),
+					targetPlayer.getDisplayName(), targetPlayersHandCard.getName(), playersOtherCard.getName());
+			String msgTargetPlayer = String.format(
+					"Player %s played %s against you. You gave away %s and just got %s.", getOwner().getDisplayName(),
+					getName(), targetPlayersHandCard.getName(), playersOtherCard.getName());
+			String msgOthers = String.format("Player %s played %s against %s.", getOwner().getDisplayName(), getName(),
+					targetPlayer.getDisplayName());
+			Messages.addTo(msgPlayer, getOwner());
+			Messages.addTo(msgTargetPlayer, targetPlayer);
+			Messages.addNotTo(msgOthers, getOwner(), targetPlayer);
+		}
 	}
 
 }

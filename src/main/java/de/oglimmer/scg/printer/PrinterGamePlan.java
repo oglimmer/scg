@@ -7,7 +7,7 @@ import de.oglimmer.scg.core.Card;
 import de.oglimmer.scg.core.Game;
 import de.oglimmer.scg.core.Player;
 
-public class PrinterGame {
+public class PrinterGamePlan {
 
 	public static final String CR = "\r\n";
 
@@ -15,7 +15,7 @@ public class PrinterGame {
 
 	protected Game game;
 
-	public PrinterGame(Game game) {
+	public PrinterGamePlan(Game game) {
 		this.game = game;
 	}
 
@@ -29,15 +29,15 @@ public class PrinterGame {
 	protected void addLastActions() {
 		buff.append(CR);
 		buff.append("Last actions: ").append(CR);
-		buff.append(game.getCurrentPlayer().getMessages().getAll());
+		buff.append(game.getTurn().getCurrentPlayer().getMessages().getAll());
 	}
 
-	protected PrinterPlayer createPrinterPlayer(Player p) {
-		return new PrinterPlayer(p);
+	protected PrinterPlayerPlan createPrinterPlayer(Player p) {
+		return new PrinterPlayerPlan(p);
 	}
 
 	private void addCurrentPlayersCards() {
-		PrinterPlayer pp = createPrinterPlayer(game.getCurrentPlayer());
+		PrinterPlayerPlan pp = createPrinterPlayer(game.getTurn().getCurrentPlayer());
 		pp.addCurrentPlayersCards();
 		buff.append(pp.toString());
 	}
@@ -97,7 +97,7 @@ public class PrinterGame {
 	}
 
 	private void addPlayer(Player p) {
-		PrinterPlayer pp = createPrinterPlayer(p);
+		PrinterPlayerPlan pp = createPrinterPlayer(p);
 		pp.addPlayer();
 		buff.append(pp.toString());
 	}

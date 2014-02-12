@@ -31,8 +31,10 @@ public class IsTargetValidTest {
 		when(playerOther.getGame()).thenReturn(game);
 		when(playerOwner.isTargetable()).thenReturn(true);
 		when(playerOther.isTargetable()).thenReturn(true);
+		when(playerOwner.isCurrentPlayer()).thenReturn(true);
+		when(playerOther.isCurrentPlayer()).thenReturn(false);
 
-		when(game.getCurrentPlayer()).thenReturn(playerOwner);
+		when(game.getTurn().getCurrentPlayer()).thenReturn(playerOwner);
 		when(game.getPlayer(0)).thenReturn(playerOwner);
 		when(game.getPlayer(1)).thenReturn(playerOther);
 		when(game.getPlayers()).thenReturn(Arrays.asList(new Player[] { playerOwner, playerOther }));

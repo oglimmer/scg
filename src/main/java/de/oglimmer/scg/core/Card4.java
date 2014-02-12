@@ -13,19 +13,26 @@ public class Card4 extends Card {
 	}
 
 	@Override
-	public boolean playImpl(Integer param1, Integer param2) {
+	public void play(Integer targetPlayerNo, Integer targetCardNo) {
 		addMsg(getOwner());
 		getOwner().getCardHand().changeType(this, Type.OPEN);
-		return false;
-	}
-
-	private void addMsg(Player player) {
-		Messages.addTo("You have played " + getName() + ".", player);
-		Messages.addNotTo("Player " + player.getDisplayName() + " played " + getName() + ".", player);
 	}
 
 	@Override
-	public int getNo() {
-		return 4;
+	public boolean isProtectsOwner() {
+		return true;
 	}
+
+	@Override
+	public boolean isEnduring() {
+		return true;
+	}
+
+	private void addMsg(Player player) {
+		String msgPlayer = "You have played " + getName() + ".";
+		String msgOthers = "Player " + player.getDisplayName() + " played " + getName() + ".";
+		Messages.addTo(msgPlayer, player);
+		Messages.addNotTo(msgOthers, player);
+	}
+
 }

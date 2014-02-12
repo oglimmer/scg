@@ -21,26 +21,47 @@ public class Card3 extends TargetableCard {
 	}
 
 	@Override
-	public boolean playOnTarget(Player otherPlayer, Integer param2) {
+	public void playOnTarget(Player targetPlayer, Integer unused) {
+		Fight fight = new Fight(targetPlayer);
+		fight.processTurn();
+	}
 
-		AssociatedCard otherAc = otherPlayer.getCardHand().getCard(Type.HAND);
-		AssociatedCard myOtherAc = getOwner().getCardHand().getOwnerOtherAssociatedCard(this);
+	class Fight {
 
-		log.debug("Card3 played from {} with {} on {} with {}", getOwner(), otherPlayer, myOtherAc, otherAc);
+		private final Player targetPlayer;
+		private final Card targetPlayersHandCard;
+		private final Card originPlayersOtherCard;
+		private final Card3MessageFacade msg;
 
-		Card3MessageFacade msg = new Card3MessageFacade(getOwner(), otherPlayer, myOtherAc.getCard(), otherAc.getCard());
-
-		if (myOtherAc.getCard().getNo() > otherAc.getCard().getNo()) {
-			msg.addMsgTargetKilled();
-			otherPlayer.killPlayer();
-		} else if (myOtherAc.getCard().getNo() < otherAc.getCard().getNo()) {
-			msg.addMsgInitiatorKilled();
-			getOwner().killPlayer();
-		} else {
-			msg.addMsgTie();
+		Fight(Player targetPlayer) {
+			this.targetPlayer = targetPlayer;
+			this.targetPlayersHandCard = getTargetPlayersHandCard(targetPlayer);
+			this.originPlayersOtherCard = getOriginPlayersOtherCard();
+			this.msg = new Card3MessageFacade(getOwner(), targetPlayer, originPlayersOtherCard, targetPlayersHandCard);
 		}
 
-		return true;
+		private void processTurn() {
+			log.debug("Card3 played from {} with {} on {} with {}", getOwner(), targetPlayer, originPlayersOtherCard,
+					targetPlayersHandCard);
+			if (originPlayersOtherCard.getNo() > targetPlayersHandCard.getNo()) {
+				msg.addMsgTargetKilled();
+				targetPlayer.killPlayer();
+			} else if (originPlayersOtherCard.getNo() < targetPlayersHandCard.getNo()) {
+				msg.addMsgInitiatorKilled();
+				getOwner().killPlayer();
+			} else {
+				msg.addMsgTie();
+			}
+		}
+
+		private Card getOriginPlayersOtherCard() {
+			return getOwner().getCardHand().getOwnerOtherCard(Card3.this);
+		}
+
+		private Card getTargetPlayersHandCard(Player targetPlayer) {
+			return targetPlayer.getCardHand().getCard(Type.HAND);
+		}
+
 	}
 
 	enum Recipient {

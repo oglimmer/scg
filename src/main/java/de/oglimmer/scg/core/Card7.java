@@ -13,14 +13,8 @@ public class Card7 extends Card {
 	}
 
 	@Override
-	public boolean playImpl(Integer param1, Integer param2) {
+	public void play(Integer targetPlayerNo, Integer targetCardNo) {
 		addMsg(getOwner());
-		return true;
-	}
-
-	@Override
-	public int getNo() {
-		return 7;
 	}
 
 	private void addMsg(Player player) {

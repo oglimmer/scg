@@ -15,7 +15,7 @@ public class EmailTurn extends WebTurn {
 	}
 
 	private void sendEmailLastPlayer() {
-		EmailSender.send(currentPlayer, "Outcome Of Your Turn", outcome, false);
+		EmailSender.sendPlain(currentPlayer, "Outcome Of Your Turn", outcome);
 	}
 
 }

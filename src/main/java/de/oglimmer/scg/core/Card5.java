@@ -1,5 +1,6 @@
 package de.oglimmer.scg.core;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -20,14 +21,14 @@ public class Card5 extends TargetableCard {
 	}
 
 	@Override
-	public boolean playOnTarget(final Player otherPlayer, Integer param2) {
+	public void playOnTarget(Player targetPlayer, Integer targetCardNo) {
+		Card targetPlayersCardToRemove = getTargetPlayersCardToRemove(targetPlayer);
+		targetPlayersCardToRemove.discard(new OnDiscardSucceded(getOwner(), targetPlayer, targetPlayersCardToRemove));
+		addMsg(getOwner(), targetPlayer, targetPlayersCardToRemove);
+	}
 
-		final AssociatedCard toRemove = otherPlayer.getCardHand().getCardNotInPlayAndNotOpen();
-		toRemove.getCard().discard(new OnDiscardSucceded(getOwner(), otherPlayer, toRemove));
-
-		addMsg(getOwner(), otherPlayer, toRemove.getCard());
-
-		return true;
+	private Card getTargetPlayersCardToRemove(Player targetPlayer) {
+		return targetPlayer.getCardHand().getCardNotInPlayAndNotOpen();
 	}
 
 	@Override
@@ -40,53 +41,48 @@ public class Card5 extends TargetableCard {
 		return getOwner().getGame().getPlayer(targetPlayerNo).isTargetable();
 	}
 
-	private void addMsg(Player player, final Player otherPlayer, Card dropped) {
-		Messages.addTo("You have played " + getName() + " against " + otherPlayer.getDisplayName() + ". He dropped "
-				+ dropped.getName(), player);
-
-		Messages.addNotTo(
-				"Player " + player.getDisplayName() + " played " + getName() + " against "
-						+ otherPlayer.getDisplayName() + ", so he lost " + dropped.getName(), player, otherPlayer);
-	}
-
-	@Override
-	public int getNo() {
-		return 5;
-	}
-
 	@Override
 	public boolean isPlayable() {
 		return !getOwner().getCardHand().hasCard(7);
 	}
 
+	private void addMsg(Player player, final Player otherPlayer, Card dropped) {
+		String msgPlayer = "You have played " + getName() + " against " + otherPlayer.getDisplayName()
+				+ ". He dropped " + dropped.getName();
+		String msgOthers = "Player " + player.getDisplayName() + " played " + getName() + " against "
+				+ otherPlayer.getDisplayName() + ", so he lost " + dropped.getName();
+		Messages.addTo(msgPlayer, player);
+		// No message to otherPlayer at this point
+		Messages.addNotTo(msgOthers, player, otherPlayer);
+	}
+
+	@AllArgsConstructor
 	class OnDiscardSucceded implements Runnable {
 
-		private Player player;
-		private Player otherPlayer;
-		private AssociatedCard toRemove;
-
-		public OnDiscardSucceded(Player player, Player otherPlayer, AssociatedCard toRemove) {
-			this.player = player;
-			this.otherPlayer = otherPlayer;
-			this.toRemove = toRemove;
-		}
+		private Player originPlayer;
+		private Player targetPlayer;
+		private Card toRemoveCard;
 
 		@Override
 		public void run() {
-			Card card;
+			Card card = drawCard();
+			targetPlayer.getCardHand().addCard(card, Type.HAND);
+			log.debug("Card 5: removed {} and got {}", toRemoveCard, card);
+			addMsg(card);
+		}
+
+		private void addMsg(Card newCard) {
+			String msgTargetPlayer = String.format("Player %s played %s against you. You lost %s and got %s.",
+					originPlayer.getDisplayName(), getName(), toRemoveCard.getName(), newCard.getName());
+			Messages.addTo(msgTargetPlayer, targetPlayer);
+		}
+
+		private Card drawCard() {
 			if (getOwner().getGame().getStackHidden().getCards().isEmpty()) {
-				card = getOwner().getGame().getSpare();
+				return getOwner().getGame().getSpare();
 			} else {
-				card = getOwner().getGame().getStackHidden().takeTop();
+				return getOwner().getGame().getStackHidden().takeTop();
 			}
-
-			otherPlayer.getCardHand().addCard(card, Type.HAND);
-
-			log.debug("Card 5: removed {} and got {}", toRemove, card);
-
-			Messages.addTo("Player " + player.getDisplayName() + " played " + getName() + " against you. You lost "
-					+ toRemove.getCard().getName() + " and got "
-					+ otherPlayer.getCardHand().getCard(Type.HAND).getCard().getName(), otherPlayer);
 		}
 	}
 }

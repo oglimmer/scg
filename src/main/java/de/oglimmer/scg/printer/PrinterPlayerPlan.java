@@ -5,24 +5,24 @@ import de.oglimmer.scg.core.Card;
 import de.oglimmer.scg.core.Player;
 import de.oglimmer.scg.core.Type;
 
-public class PrinterPlayer {
+public class PrinterPlayerPlan {
 
 	protected StringBuilder buff = new StringBuilder(1024);
 
 	protected Player player;
 
-	public PrinterPlayer(Player player) {
+	public PrinterPlayerPlan(Player player) {
 		this.player = player;
 	}
 
 	public void addPlayer() {
-		if (player != player.getGame().getCurrentPlayer()) {
+		if (!player.isCurrentPlayer()) {
 			buff.append(player.getEmail()).append(" (").append(player.getNo()).append(") is ");
 		} else {
 			buff.append("You are ");
 		}
 		addOtherPlayer();
-		buff.append(PrinterGame.CR);
+		buff.append(PrinterGamePlan.CR);
 	}
 
 	protected void addOtherPlayer() {
@@ -59,7 +59,7 @@ public class PrinterPlayer {
 	}
 
 	protected void addCurrentPlayersCards() {
-		buff.append(PrinterGame.CR).append("Your cards:").append(PrinterGame.CR);
+		buff.append(PrinterGamePlan.CR).append("Your cards:").append(PrinterGamePlan.CR);
 
 		for (AssociatedCard ac : player.getCardHand().getAssociatedCards()) {
 			addCard(ac);
@@ -74,7 +74,7 @@ public class PrinterPlayer {
 		addCardIsPlayableStatus(ac);
 		addCardNameDesc(card);
 
-		buff.append(PrinterGame.CR).append(PrinterGame.CR);
+		buff.append(PrinterGamePlan.CR).append(PrinterGamePlan.CR);
 	}
 
 	private void addCardNameDesc(Card card) {

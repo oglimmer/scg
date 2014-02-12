@@ -1,5 +1,6 @@
 package de.oglimmer.scg.core;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -21,53 +22,100 @@ public class Card1 extends TargetableCard {
 	}
 
 	@Override
-	public boolean playOnTarget(Player otherPlayer, Integer targetCard) {
+	public void playOnTarget(Player targetPlayer, Integer targetCardNo) {
+		Guess guess = new Guess(targetCardNo, targetPlayer);
+		guess.processOutcome();
+	}
 
-		AssociatedCard otherAc = otherPlayer.getCardHand().getCard(Type.HAND);
-		Card guessedCard = Card.get(targetCard);
+	class Guess {
 
-		log.debug("Card1 played on {} who has {} you guessed {}", otherPlayer, otherAc, targetCard);
+		private final int targetCardNo;
+		private final Card targetPlayersHandCard;
+		private final Card guessedCard;
+		private final Player targetPlayer;
+		private final Message message;
 
-		if (targetCard == 1) {
-			addMsgError(getOwner(), otherPlayer);
-		} else if (guessedCard.getNo() == otherAc.getCard().getNo()) {
-			addMsgTargetDead(getOwner(), otherPlayer, guessedCard);
-			otherPlayer.killPlayer();
-		} else {
-			addMsgMiss(getOwner(), otherPlayer, guessedCard);
+		public Guess(int targetCardNo, Player targetPlayer) {
+			this.targetCardNo = targetCardNo;
+			this.targetPlayer = targetPlayer;
+			this.targetPlayersHandCard = getTargetPlayersHandCard();
+			this.guessedCard = Card.get(targetCardNo);
+			this.message = new Message(getOwner(), targetPlayer, guessedCard);
 		}
 
-		return true;
+		void processOutcome() {
+			log.debug("Card1 played on {} who has {} you guessed {}", targetPlayer, targetPlayersHandCard, targetCardNo);
+			if (targetCardNo == 1) {
+				handleInvalidGuess();
+			} else if (guessedCard.getNo() == targetPlayersHandCard.getNo()) {
+				handleHitGuess();
+			} else {
+				handleMissGuess();
+			}
+		}
+
+		private void handleMissGuess() {
+			message.addMsgMiss();
+		}
+
+		private void handleHitGuess() {
+			message.addMsgTargetDead();
+			targetPlayer.killPlayer();
+		}
+
+		private void handleInvalidGuess() {
+			message.addMsgError();
+		}
+
+		private Card getTargetPlayersHandCard() {
+			return targetPlayer.getCardHand().getCard(Type.HAND);
+		}
 	}
 
-	private void addMsgMiss(Player player, Player otherPlayer, Card guessedCard) {
-		Messages.addTo("Your guess (" + guessedCard.getName() + ") was wrong.", player);
-		Messages.addTo("The player " + player.getDisplayName() + " has tried to kill you with " + getName()
-				+ ", but failed. He guessed " + guessedCard.getName() + ".", otherPlayer);
-		Messages.addNotTo(
-				"The player " + player.getDisplayName() + " has tried to kill the player "
-						+ otherPlayer.getDisplayName() + " with " + getName() + ", but failed. The wrong guess was "
-						+ guessedCard.getName() + ".", player, otherPlayer);
-	}
+	@AllArgsConstructor
+	class Message {
 
-	private void addMsgTargetDead(Player player, Player otherPlayer, Card guessedCard) {
-		Messages.addTo("Your guess (" + guessedCard.getName() + ") was right. Player " + otherPlayer.getDisplayName()
-				+ " dead.", player);
-		Messages.addTo("The player " + player.getDisplayName() + " has killed you with " + getName() + ".", otherPlayer);
-		Messages.addNotTo(
-				"The player " + player.getDisplayName() + " has killed the player " + otherPlayer.getDisplayName()
-						+ " with " + getName() + ". Guess " + guessedCard.getName() + " was correct.", player,
-				otherPlayer);
-	}
+		private Player player;
+		private Player targetPlayer;
+		private Card guessedCard;
 
-	private void addMsgError(Player player, Player otherPlayer) {
-		Messages.addTo("Bad guess. " + getName() + " is not allowed.", player);
-		Messages.addTo("The player " + player.getDisplayName() + " has tried to kill you with " + getName()
-				+ ", but failed as he guessed " + getName(), otherPlayer);
-		Messages.addNotTo(
-				"The player " + player.getDisplayName() + " has tried to kill the player "
-						+ otherPlayer.getDisplayName() + " with " + getName() + ", but failed as he guessed "
-						+ getName() + ".", player, otherPlayer);
-	}
+		private void addMessages(String msgPlayer, String msgTargetPlayer, String msgOthers) {
+			Messages.addTo(msgPlayer, player);
+			Messages.addTo(msgTargetPlayer, targetPlayer);
+			Messages.addNotTo(msgOthers, player, targetPlayer);
+		}
 
+		void addMsgMiss() {
+			String msgPlayer = String.format("Your guess (%s) was wrong.", guessedCard.getName());
+			String msgTargetPlayer = String.format(
+					"The player %s has tried to kill you with %s, but failed. He guessed %s.", player.getDisplayName(),
+					getName(), guessedCard.getName());
+			String msgOthers = String.format(
+					"The player %s has tried to kill the player %s with %s, but failed. The wrong guess was "
+							+ guessedCard.getName() + ".", player.getDisplayName(), targetPlayer.getDisplayName(),
+					getName());
+			addMessages(msgPlayer, msgTargetPlayer, msgOthers);
+		}
+
+		void addMsgTargetDead() {
+			String msgPlayer = String.format("Your guess (%s) was right. Player " + targetPlayer.getDisplayName()
+					+ " dead.", guessedCard.getName());
+			String msgTargetPlayer = String.format("The player %s has killed you with %s.", player.getDisplayName(),
+					getName());
+			String msgOthers = String.format("The player %s has killed the player %s with %s. Guess %s was correct.",
+					player.getDisplayName(), targetPlayer.getDisplayName(), getName(), guessedCard.getName());
+			addMessages(msgPlayer, msgTargetPlayer, msgOthers);
+		}
+
+		void addMsgError() {
+			String msgPlayer = String.format("Bad guess. %s is not allowed.", getName());
+			String msgTargetPlayer = String.format(
+					"The player %s has tried to kill you with %s, but failed as he guessed %s.",
+					player.getDisplayName(), getName(), getName());
+			String msgOthers = String.format(
+					"The player %s has tried to kill the player %s with %s, but failed as he guessed %s.",
+					player.getDisplayName(), targetPlayer.getDisplayName(), getName(), getName());
+			addMessages(msgPlayer, msgTargetPlayer, msgOthers);
+		}
+	}
 }

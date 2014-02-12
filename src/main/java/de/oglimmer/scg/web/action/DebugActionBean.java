@@ -24,13 +24,13 @@ public class DebugActionBean extends BaseAction {
 	}
 
 	public Resolution delete() {
-		GameManager.INSTANCE.removeGame(GameManager.INSTANCE.getGame(gameId));
+		GameManager.INSTANCE.removeGameMemoryAndFile(GameManager.INSTANCE.getGame(gameId));
 		return new ForwardResolution("/WEB-INF/jsp/debug.jsp");
 	}
 
 	public Resolution resendEmail() {
 		Game game = GameManager.INSTANCE.getGame(gameId);
-		EmailSender.sendTurn(game.getCurrentPlayer(), "Your Turn", game);
+		EmailSender.sendTurn(game.getTurn().getCurrentPlayer(), "Your Turn", game);
 		return new ForwardResolution("/WEB-INF/jsp/debug.jsp");
 	}
 

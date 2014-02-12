@@ -13,14 +13,8 @@ public class Card8 extends Card {
 	}
 
 	@Override
-	public boolean playImpl(Integer param1, Integer param2) {
+	public void play(Integer targetPlayerNo, Integer targetCardNo) {
 		discard(null);
-		return true;
-	}
-
-	@Override
-	public int getNo() {
-		return 8;
 	}
 
 	@Override

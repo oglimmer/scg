@@ -14,6 +14,7 @@ import org.junit.runners.Parameterized.Parameters;
 import de.oglimmer.scg.core.Card;
 import de.oglimmer.scg.core.Game;
 import de.oglimmer.scg.core.GameEndException;
+import de.oglimmer.scg.core.Play;
 import de.oglimmer.scg.core.Player;
 import de.oglimmer.scg.core.Type;
 
@@ -45,12 +46,12 @@ public class CardBaseTest {
 
 		private int cardA;
 		private int cardB;
-		private int play;
+		private int cardNoToPlay;
 
-		CardTest(int cardA, int cardB, int play, ExpectedResult expectedResult) {
+		CardTest(int cardA, int cardB, int cardNoToPlay, ExpectedResult expectedResult) {
 			this.cardA = cardA;
 			this.cardB = cardB;
-			this.play = play;
+			this.cardNoToPlay = cardNoToPlay;
 			this.expectedResult = expectedResult;
 		}
 
@@ -88,13 +89,15 @@ public class CardBaseTest {
 			playerA.getCardHand().addCard(Card.get(cardB), Type.DRAWN);
 
 			Iterator<Player> it = game.getPlayers().iterator();
-			game.setPlayerIterator(it);
-			game.setCurrentPlayer(it.next());
+			game.getTurn().setPlayerIterator(it);
+			game.getTurn().setCurrentPlayer(it.next());
 		}
 
 		private void play(int targetPlayerNo, int card1TargetNo) throws GameEndException {
-			playResult = game.play(new String[] { Integer.toString(play), Integer.toString(targetPlayerNo),
-					Integer.toString(card1TargetNo) });
+			String[] cmdLine = new String[] { Integer.toString(cardNoToPlay), Integer.toString(targetPlayerNo),
+					Integer.toString(card1TargetNo) };
+			Play play = game.getTurn().getPlay(cmdLine);
+			playResult = play.play();
 		}
 
 		private void validate() {
@@ -119,7 +122,7 @@ public class CardBaseTest {
 			if (!playerA.isDead()) {
 				validatePlayer(playerA);
 				if (expectedResult.getPlayerAOpen() != null) {
-					Card cardOpen = playerA.getCardHand().getCard(Type.OPEN).getCard();
+					Card cardOpen = playerA.getCardHand().getCard(Type.OPEN);
 					assertThat(expectedResult.toString(), cardOpen.getNo(), is(expectedResult.getPlayerAOpen()));
 				}
 			}
@@ -132,7 +135,7 @@ public class CardBaseTest {
 		}
 
 		private void validatePlayer(Player player) {
-			Card cardHand = player.getCardHand().getCard(Type.HAND).getCard();
+			Card cardHand = player.getCardHand().getCard(Type.HAND);
 			assertThat(expectedResult.toString(), cardHand.getNo(), is(getHandForPlayer(player)));
 		}
 

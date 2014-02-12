@@ -38,19 +38,26 @@ public class Player implements Serializable {
 	}
 
 	protected void killPlayer() {
-		for (AssociatedCard ac : cardHand.getAssociatedCardNotInPlay()) {
-			game.getStackOpen().add(ac.getCard());
-		}
-		cardHand.clear();
-
-		EmailSender.send(this, "Your are dead", messages.getAll(), false);
+		cardHand.moveAllToOpenStack();
+		EmailSender.sendPlain(this, "Your are dead", messages.getAll());
 		log.debug("{} is dead", this);
 	}
 
 	public boolean isTargetable() {
-		if (cardHand.hasOpenCard(4)) {
-			return false;
+		boolean protectedOrDead = isProtectedByCard() || isDead();
+		return !protectedOrDead;
+	}
+
+	private boolean isProtectedByCard() {
+		for (AssociatedCard card : cardHand.getAssociatedCards()) {
+			if (card.getCard().isProtectsOwner() && card.getType() == Type.OPEN) {
+				return true;
+			}
 		}
-		return !isDead();
+		return false;
+	}
+
+	public boolean isCurrentPlayer() {
+		return game.getTurn().getCurrentPlayer() == this;
 	}
 }

@@ -24,6 +24,12 @@ public class CreateGameActionBean extends BaseAction {
 	}
 
 	public Resolution create() {
+		Game game = createAndStartGame();
+		EmailSender.sendTurn(game.getTurn().getCurrentPlayer(), "Your Turn", game);
+		return new ForwardResolution("/WEB-INF/jsp/createGameDone.jsp");
+	}
+
+	private Game createAndStartGame() {
 		Game game = GameManager.INSTANCE.addGame();
 		game.setAutoSave(true);
 		game.addPlayer(email1);
@@ -31,9 +37,7 @@ public class CreateGameActionBean extends BaseAction {
 		game.addPlayer(email3);
 		game.addPlayer(email4);
 		game.start();
-		EmailSender.sendTurn(game.getCurrentPlayer(), "Your Turn", game);
-
-		return new ForwardResolution("/WEB-INF/jsp/createGameDone.jsp");
+		return game;
 	}
 
 }

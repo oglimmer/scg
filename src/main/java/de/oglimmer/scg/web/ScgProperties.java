@@ -1,7 +1,9 @@
 package de.oglimmer.scg.web;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import lombok.SneakyThrows;
@@ -9,16 +11,33 @@ import lombok.SneakyThrows;
 public enum ScgProperties {
 	INSTANCE;
 
+	private static final String SYSTEM_PROPERTY = "scg.properties";
 	private Properties prop = new Properties();
 
 	@SneakyThrows(value = IOException.class)
 	private ScgProperties() {
-		if (System.getProperty("scg.properties") != null) {
-			try (FileInputStream fis = new FileInputStream(System.getProperty("scg.properties"))) {
-				prop.load(fis);
-			}
+		if (isAbsoluteFilepathAvail()) {
+			loadFromAbsoluteFilename();
 		} else {
-			prop.load(this.getClass().getResourceAsStream("/scg.properties"));
+			loadFromClasspath();
+		}
+	}
+
+	private boolean isAbsoluteFilepathAvail() {
+		return getFilenameProperty() != null;
+	}
+
+	private String getFilenameProperty() {
+		return System.getProperty(SYSTEM_PROPERTY);
+	}
+
+	private void loadFromClasspath() throws IOException {
+		prop.load(this.getClass().getResourceAsStream("/scg.properties"));
+	}
+
+	private void loadFromAbsoluteFilename() throws IOException, FileNotFoundException {
+		try (InputStream is = new FileInputStream(getFilenameProperty())) {
+			prop.load(is);
 		}
 	}
 

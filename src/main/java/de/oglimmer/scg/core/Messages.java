@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.oglimmer.scg.printer.PrinterGamePlan;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
@@ -16,46 +17,44 @@ public class Messages implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static void addTo(String msg, Player player) {
-		player.getMessages().add(msg, player.getGame().getTurn());
-		log.debug("Added to player {} = {}", player.getNo(), msg);
-	}
-
 	public static void addNotTo(String msg, Player... excludedPlayers) {
 		Game game = excludedPlayers[0].getGame();
 		List<Player> excludedPlayersCol = Arrays.asList(excludedPlayers);
 		for (Player player : game.getPlayers()) {
 			if (!excludedPlayersCol.contains(player)) {
-				player.getMessages().add(msg, player.getGame().getTurn());
-				log.debug("Added to player {} = {}", player.getNo(), msg);
+				addTo(msg, player);
 			}
 		}
 	}
 
 	public static void addTo(String msg, Game game) {
 		for (Player player : game.getPlayers()) {
-			player.getMessages().add(msg, game.getTurn());
-			log.debug("Added to player {} = {}", player.getNo(), msg);
+			addTo(msg, player);
 		}
 	}
 
-	private List<Message> messages = new ArrayList<>(60);
+	public static void addTo(String msg, Player player) {
+		player.getMessages().add(msg);
+		log.debug("Added to player {} = {}", player.getNo(), msg);
+	}
 
-	private Game game;
+	private final List<Message> messages = new ArrayList<>(60);
+
+	private final Game game;
 
 	public Messages(Game game) {
 		this.game = game;
 	}
 
-	private void add(String msg, int round) {
-		messages.add(new Message(msg, round));
+	private void add(String msg) {
+		messages.add(new Message(msg, game.getTurn().getTurnNo()));
 	}
 
 	public String getLastTurn() {
 		StringBuilder buff = new StringBuilder();
 		for (Message msg : messages) {
-			if (game.getTurn() - 1 == msg.getTurn()) {
-				buff.append(msg.getMsg()).append("\r\n");
+			if (game.getTurn().getTurnNo() - 1 == msg.getTurn()) {
+				buff.append(msg.getMsg()).append(PrinterGamePlan.CR);
 			}
 		}
 		if (buff.length() == 0) {
@@ -67,7 +66,7 @@ public class Messages implements Serializable {
 	public String getAll() {
 		StringBuilder buff = new StringBuilder();
 		for (Message msg : messages) {
-			buff.append("* ").append(msg.getMsg()).append("\r\n");
+			buff.append("* ").append(msg.getMsg()).append(PrinterGamePlan.CR);
 		}
 		return buff.toString();
 	}

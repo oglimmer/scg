@@ -35,7 +35,7 @@ public class WinCondition {
 
 		private void processPlayer(Player player) {
 			if (!player.isDead()) {
-				int handCardNo = player.getCardHand().getCard(Type.HAND).getCard().getNo();
+				int handCardNo = player.getCardHand().getCard(Type.HAND).getNo();
 				if (handCardNo > maxCardNo) {
 					newBestPlayer(player, handCardNo);
 				} else if (handCardNo == maxCardNo) {

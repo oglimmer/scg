@@ -3,9 +3,11 @@ package de.oglimmer.scg.web;
 import de.oglimmer.scg.core.Card;
 import de.oglimmer.scg.core.Game;
 import de.oglimmer.scg.core.GameEndException;
+import de.oglimmer.scg.core.Play;
 import de.oglimmer.scg.core.Player;
 import de.oglimmer.scg.core.Type;
 import de.oglimmer.scg.email.EmailSender;
+import de.oglimmer.scg.printer.PrinterGamePlan;
 
 public class WebTurn {
 
@@ -19,13 +21,14 @@ public class WebTurn {
 
 		game = GameManager.INSTANCE.getGame(gameId);
 		currentPlayer = game.getPlayer(playerId);
+		if (!currentPlayer.isCurrentPlayer()) {
+			throw new RuntimeException(playerId + " is not the current player");
+		}
 	}
 
 	public String process() {
 		outcome = null;
-		if (game.getCurrentPlayer() == currentPlayer) {
-			processValidPlayer();
-		}
+		processValidPlayer();
 		return outcome;
 	}
 
@@ -38,7 +41,8 @@ public class WebTurn {
 	}
 
 	private void processPlay() throws GameEndException {
-		if (game.play(firstRow)) {
+		Play play = game.getTurn().getPlay(firstRow);
+		if (play.play()) {
 			processValidOutcome();
 		} else {
 			processInvalidOutcome();
@@ -46,7 +50,7 @@ public class WebTurn {
 	}
 
 	private void processInvalidOutcome() {
-		EmailSender.sendTurn(game.getCurrentPlayer(), "Repeate Your Turn", game);
+		EmailSender.sendTurn(game.getTurn().getCurrentPlayer(), "Repeate Your Turn", game);
 	}
 
 	protected void processValidOutcome() {
@@ -55,7 +59,7 @@ public class WebTurn {
 	}
 
 	private void sendEmailNextPlayer() {
-		EmailSender.sendTurn(game.getCurrentPlayer(), "Your Turn", game);
+		EmailSender.sendTurn(game.getTurn() .getCurrentPlayer(), "Your Turn", game);
 	}
 
 	private void getLastTurnsMessages() {
@@ -64,36 +68,60 @@ public class WebTurn {
 
 	private void processGameEnd(GameEndException e) {
 		for (Player p : game.getPlayers()) {
-			EmailSender.send(p, "Game Ended", buildGameEndText(e, p), false);
+			GameEndTextBuilder getb = new GameEndTextBuilder();
+			getb.buildGameEndText(e, p);
+			EmailSender.sendPlain(p, "Game Ended", getb.toString());
 		}
-		GameManager.INSTANCE.removeGame(game);
+		GameManager.INSTANCE.removeGameMemoryAndFile(game);
 	}
 
-	private String buildGameEndText(GameEndException e, Player emailTarget) {
+	class GameEndTextBuilder {
 		StringBuilder buff = new StringBuilder();
-		buff.append(e.getMessage());
-		buff.append("\r\n\r\n");
-		buff.append("Handcards of the players:");
-		buff.append("\r\n");
-		for (Player gamePlayer : game.getPlayers()) {
+
+		void buildGameEndText(GameEndException e, Player emailTarget) {
+			addExceptionText(e);
+			addHandcardHeader();
+			for (Player gamePlayer : game.getPlayers()) {
+				addHandcardForPlayer(gamePlayer);
+			}
+			addAllActions(emailTarget);
+		}
+
+		private void addAllActions(Player emailTarget) {
+			buff.append(PrinterGamePlan.CR + PrinterGamePlan.CR);
+			buff.append("The game:");
+			buff.append(PrinterGamePlan.CR);
+			buff.append(emailTarget.getMessages().getAll());
+		}
+
+		private void addHandcardForPlayer(Player gamePlayer) {
 			buff.append(gamePlayer.getDisplayName());
 			buff.append(" => ");
 			if (gamePlayer.isDead()) {
 				buff.append("dead");
 			} else {
-				Card handCard = gamePlayer.getCardHand().getCard(Type.HAND).getCard();
+				Card handCard = gamePlayer.getCardHand().getCard(Type.HAND);
 				buff.append(handCard.getName());
 				buff.append(" (");
 				buff.append(handCard.getNo());
 				buff.append(")");
 			}
-			buff.append("\r\n");
+			buff.append(PrinterGamePlan.CR);
 		}
-		buff.append("\r\n\r\n");
-		buff.append("The game:");
-		buff.append("\r\n");
-		buff.append(emailTarget.getMessages().getAll());
-		return buff.toString();
+
+		private void addHandcardHeader() {
+			buff.append(PrinterGamePlan.CR + PrinterGamePlan.CR);
+			buff.append("Handcards of the players:");
+			buff.append(PrinterGamePlan.CR);
+		}
+
+		private void addExceptionText(GameEndException e) {
+			buff.append(e.getMessage());
+		}
+
+		public String toString() {
+			return buff.toString();
+		}
 	}
 
 }

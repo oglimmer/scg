@@ -1,42 +1,29 @@
 package de.oglimmer.scg.web;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import lombok.Getter;
 import de.oglimmer.scg.email.EmailSender;
 import de.oglimmer.scg.email.ImapProcessorObserver;
 
 public class ScgServletContextListener implements ServletContextListener {
 
+	@Getter
+	private static String longVersion;
+
 	@Override
-	public void contextInitialized(ServletContextEvent arg0) {
-		restoreSavedGames();
+	public void contextInitialized(ServletContextEvent sc) {
+		longVersion = new LongVersionBuilder().build(sc.getServletContext());
+		GameManager.INSTANCE.restoreSavedGames();
 		ImapProcessorObserver.INSTANCE.hashCode();
 		EmailSender.start();
 	}
 
 	@Override
-	public void contextDestroyed(ServletContextEvent arg0) {
+	public void contextDestroyed(ServletContextEvent sc) {
 		ImapProcessorObserver.INSTANCE.stop();
 		EmailSender.close();
 	}
-
-	private void restoreSavedGames() {
-		File backupDir = new File(ScgProperties.INSTANCE.getBackupDir());
-		File[] listFiles = backupDir.listFiles(new _FilenameFilter());
-		for (File file : listFiles) {
-			GameManager.INSTANCE.loadGame(file);
-		}
-	}
-
-	class _FilenameFilter implements FilenameFilter {
-		@Override
-		public boolean accept(File dir, String name) {
-			return name.endsWith(".scg");
-		}
-	};
 
 }

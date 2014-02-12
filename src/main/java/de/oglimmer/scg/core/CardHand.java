@@ -7,11 +7,9 @@ import java.util.Iterator;
 
 import lombok.Data;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 @Data
 @ToString(exclude = "player")
-@Slf4j
 public class CardHand implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -24,9 +22,25 @@ public class CardHand implements Serializable {
 		this.player = player;
 	}
 
-	public void remove(Card card) {
-		cards.remove(card);
-		card.setOwner(null);
+	public void removeCardAndAddToOpenStack(Card card) {
+		Card ac = removeCard(card);
+		if (ac != null) {
+			putCardToOpenStack(ac);
+		}
+	}
+
+	private void putCardToOpenStack(Card card) {
+		player.getGame().getStackOpen().add(card);
+	}
+
+	public Card removeCard(Card card) {
+		for (AssociatedCard ac : cards) {
+			if (ac.getCard() == card) {
+				cards.remove(ac);
+				return ac.getCard();
+			}
+		}
+		return null;
 	}
 
 	public void addCard(Card card, Type type) {
@@ -34,69 +48,43 @@ public class CardHand implements Serializable {
 		cards.add(new AssociatedCard(card, type));
 	}
 
-	public void clearOpenCards() {
+	public void putOpenCardsToOpenStack() {
 		for (Iterator<AssociatedCard> it = cards.iterator(); it.hasNext();) {
 			AssociatedCard ac = it.next();
 			if (ac.getType() == Type.OPEN) {
 				it.remove();
-				player.getGame().getStackOpen().add(ac.getCard());
+				putCardToOpenStack(ac.getCard());
 			}
 		}
 	}
 
-	public Collection<AssociatedCard> getAssociatedCardNotInPlay() {
-		Collection<AssociatedCard> cardsNotInPlay = new ArrayList<>();
+	private Collection<Card> getCardNotInPlay() {
+		Collection<Card> cardsNotInPlay = new ArrayList<>();
 		for (AssociatedCard ac : cards) {
 			if (ac.getType() != Type.IN_PLAY) {
-				cardsNotInPlay.add(ac);
+				cardsNotInPlay.add(ac.getCard());
 			}
 		}
 		return cardsNotInPlay;
 	}
 
-	public AssociatedCard getCard(Type type) {
+	public Card getCard(Type type) {
 		for (AssociatedCard ac : cards) {
 			if (ac.getType() == type) {
-				return ac;
-			}
-		}
-		assert false;
-		return null;
-	}
-
-	public AssociatedCard getCardNotInPlayAndNotOpen() {
-		for (AssociatedCard ac : cards) {
-			if (ac.getType() != Type.IN_PLAY && ac.getType() != Type.OPEN) {
-				return ac;
-			}
-		}
-		assert false;
-		return null;
-	}
-
-	public void removeCard(Card card, boolean putOnOpenStack) {
-		for (AssociatedCard ac : cards) {
-			if (ac.getCard() == card) {
-				cards.remove(ac);
-				if (putOnOpenStack) {
-					player.getGame().getStackOpen().add(ac.getCard());
-				}
-				break;
-			}
-		}
-	}
-
-	public Card removeCard(Type type, boolean putOnOpenStack) {
-		for (AssociatedCard ac : cards) {
-			if (ac.getType() == type) {
-				cards.remove(ac);
-				if (putOnOpenStack) {
-					player.getGame().getStackOpen().add(ac.getCard());
-				}
 				return ac.getCard();
 			}
 		}
-		log.warn("removed card not found type:{} ", type);
+		assert false;
+		return null;
+	}
+
+	public Card getCardNotInPlayAndNotOpen() {
+		for (AssociatedCard ac : cards) {
+			if (ac.getType() != Type.IN_PLAY && ac.getType() != Type.OPEN) {
+				return ac.getCard();
+			}
+		}
+		assert false;
 		return null;
 	}
 
@@ -121,10 +109,10 @@ public class CardHand implements Serializable {
 		return cards.isEmpty();
 	}
 
-	public AssociatedCard getOwnerOtherAssociatedCard(Card card) {
+	public Card getOwnerOtherCard(Card card) {
 		for (AssociatedCard ac : cards) {
 			if (ac.getCard() != card) {
-				return ac;
+				return ac.getCard();
 			}
 		}
 		assert false;
@@ -140,7 +128,7 @@ public class CardHand implements Serializable {
 		return false;
 	}
 
-	public void clear() {
+	private void clear() {
 		cards.clear();
 	}
 
@@ -157,4 +145,10 @@ public class CardHand implements Serializable {
 		return cards;
 	}
 
+	public void moveAllToOpenStack() {
+		for (Card ac : getCardNotInPlay()) {
+			player.getGame().getStackOpen().add(ac);
+		}
+		clear();
+	}
 }

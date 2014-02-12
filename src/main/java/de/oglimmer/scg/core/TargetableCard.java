@@ -9,16 +9,14 @@ public abstract class TargetableCard extends Card {
 	}
 
 	@Override
-	final public boolean playImpl(Integer param1, Integer param2) {
-		if (isEffective(param1)) {
-			Player targetPlayer = getOwner().getGame().getPlayer(param1);
-			return playOnTarget(targetPlayer, param2);
-		} else {
-			return true;
+	final public void play(Integer targetPlayerNo, Integer targetCardNo) {
+		if (isEffective(targetPlayerNo)) {
+			Player targetPlayer = getOwner().getGame().getPlayer(targetPlayerNo);
+			playOnTarget(targetPlayer, targetCardNo);
 		}
 	}
 
-	public abstract boolean playOnTarget(Player otherPlayer, Integer param2);
+	public abstract void playOnTarget(Player targetPlayer, Integer targetCardNo);
 
 	/**
 	 * True if a card is currently effective on a players. Do not use this to check if a player can be targeted by this
@@ -28,12 +26,12 @@ public abstract class TargetableCard extends Card {
 	 *            reference to the game
 	 * @param player
 	 *            reference to the owner
-	 * @param param1
+	 * @param targetPlayerNo
 	 *            no of the target player
 	 * @return True if the card has an effect on the target player otherwise false
 	 */
-	public boolean isEffective(Integer param1) {
-		Player targetPlayer = getOwner().getGame().getPlayer(param1);
+	public boolean isEffective(Integer targetPlayerNo) {
+		Player targetPlayer = getOwner().getGame().getPlayer(targetPlayerNo);
 		return targetPlayer != getOwner();
 	}
 
@@ -43,16 +41,16 @@ public abstract class TargetableCard extends Card {
 	@Override
 	public boolean isTargetValid(Integer targetPlayerNo) {
 		Player targetPlayer = getOwner().getGame().getPlayer(targetPlayerNo);
-		if (targetPlayer == getOwner().getGame().getCurrentPlayer()) {
-			return isAllOthersProtected();
+		if (targetPlayer.isCurrentPlayer()) {
+			return isAllOtherPlayersProtected();
 		} else {
 			return targetPlayer.isTargetable();
 		}
 	}
 
-	protected boolean isAllOthersProtected() {
+	protected boolean isAllOtherPlayersProtected() {
 		for (Player p : getOwner().getGame().getPlayers()) {
-			if (p.isTargetable() && p != getOwner().getGame().getCurrentPlayer()) {
+			if (p.isTargetable() && !p.isCurrentPlayer()) {
 				return false;
 			}
 		}

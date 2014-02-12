@@ -8,7 +8,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import de.oglimmer.scg.core.Game;
 import de.oglimmer.scg.core.Player;
-import de.oglimmer.scg.printer.PrinterGame;
+import de.oglimmer.scg.printer.PrinterGamePlan;
 import de.oglimmer.scg.web.GameManager;
 import de.oglimmer.scg.web.WebTurn;
 
@@ -31,30 +31,77 @@ public class DoActionBean extends BaseAction {
 
 	@DefaultHandler
 	public Resolution show() {
-
 		log.debug("game:{}, player:{}, card:{}, targetplayer:{}, targetcard:{}", gid, pid, card, player, targetCard);
+		CommandString command = new CommandString();
+		command.build();
+		response = command.execute();
+		return findResolution();
+	}
 
-		String row = card;
-		if (player != null && !player.isEmpty()) {
-			row += "-" + player;
-			if (targetCard != null && !targetCard.isEmpty()) {
-				row += "-" + targetCard;
-			}
-		}
-
-		response = new WebTurn(gid, pid, row).process();
-
+	private Resolution findResolution() {
 		Game game = GameManager.INSTANCE.getGame(gid);
 		if (game != null) {
 			Player player = game.getPlayer(pid);
 			if (player.isDead()) {
-				return new ForwardResolution("/WEB-INF/jsp/dead.jsp");
+				return getPlayerDeadView();
 			} else {
-				response = response.replace(PrinterGame.CR, "<br/>");
-				return new ForwardResolution("/WEB-INF/jsp/do.jsp");
+				return getTurnResultView();
 			}
 		} else {
-			return new ForwardResolution("/WEB-INF/jsp/gameover.jsp");
+			return getGameEndedView();
+		}
+	}
+
+	private Resolution getTurnResultView() {
+		return new ForwardResolution("/WEB-INF/jsp/do.jsp");
+	}
+
+	private Resolution getPlayerDeadView() {
+		return new ForwardResolution("/WEB-INF/jsp/dead.jsp");
+	}
+
+	private Resolution getGameEndedView() {
+		return new ForwardResolution("/WEB-INF/jsp/gameover.jsp");
+	}
+
+	class CommandString {
+
+		private StringBuilder commandString = new StringBuilder();
+
+		String execute() {
+			String response = new WebTurn(gid, pid, commandString.toString()).process();
+			response = response.replace(PrinterGamePlan.CR, "<br/>");
+			return response;
+		}
+
+		void build() {
+			addPart1();
+			if (hasPart2()) {
+				addPart2();
+				if (hasPart3()) {
+					addPart3();
+				}
+			}
+		}
+
+		private void addPart1() {
+			commandString.append(card);
+		}
+
+		private void addPart2() {
+			commandString.append("-").append(player);
+		}
+
+		private boolean hasPart2() {
+			return player != null && !player.isEmpty();
+		}
+
+		private void addPart3() {
+			commandString.append("-").append(targetCard);
+		}
+
+		private boolean hasPart3() {
+			return targetCard != null && !targetCard.isEmpty();
 		}
 	}
 

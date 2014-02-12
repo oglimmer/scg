@@ -20,23 +20,25 @@ public class Card2 extends TargetableCard {
 	}
 
 	@Override
-	public boolean playOnTarget(Player otherPlayer, Integer param2) {
-
-		AssociatedCard otherAc = otherPlayer.getCardHand().getCard(Type.HAND);
-
-		log.debug("Card2 played on {} who has {}", otherPlayer, otherAc);
-		addMsg(getOwner(), otherPlayer, otherAc);
-
-		return true;
+	public void playOnTarget(Player targetPlayer, Integer unused) {
+		Card targetPlayersHandCard = getTargetPlayersHandCard(targetPlayer);
+		log.debug("Card2 played on {} who has {}", targetPlayer, targetPlayersHandCard);
+		addMsg(getOwner(), targetPlayer, targetPlayersHandCard);
 	}
 
-	private void addMsg(Player player, Player otherPlayer, AssociatedCard otherAc) {
-		Messages.addTo("The player " + otherPlayer.getDisplayName() + " has " + otherAc.getCard().getName()
-				+ " in his hand.", player);
-		Messages.addTo("The player " + player.getDisplayName() + " used " + getName() + " to see your hand.",
-				otherPlayer);
-		Messages.addNotTo("The player " + player.getDisplayName() + " looked at player " + otherPlayer.getDisplayName()
-				+ "'s hand with " + getName() + ".", player, otherPlayer);
+	private Card getTargetPlayersHandCard(Player targetPlayer) {
+		return targetPlayer.getCardHand().getCard(Type.HAND);
+	}
+
+	private void addMsg(Player player, Player targetPlayer, Card targetPlayersHandCard) {
+		String msgPlayer = "The player " + targetPlayer.getDisplayName() + " has " + targetPlayersHandCard.getName()
+				+ " in his hand.";
+		String msgTargetPlayer = "The player " + player.getDisplayName() + " used " + getName() + " to see your hand.";
+		String msgOthers = "The player " + player.getDisplayName() + " looked at player "
+				+ targetPlayer.getDisplayName() + "'s hand with " + getName() + ".";
+		Messages.addTo(msgPlayer, player);
+		Messages.addTo(msgTargetPlayer, targetPlayer);
+		Messages.addNotTo(msgOthers, player, targetPlayer);
 	}
 
 }

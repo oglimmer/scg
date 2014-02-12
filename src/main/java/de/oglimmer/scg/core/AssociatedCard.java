@@ -2,8 +2,10 @@ package de.oglimmer.scg.core;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+@AllArgsConstructor
 @Data
 public class AssociatedCard implements Serializable {
 
@@ -11,10 +13,5 @@ public class AssociatedCard implements Serializable {
 
 	private Card card;
 	private Type type;
-
-	public AssociatedCard(Card card, Type type) {
-		this.card = card;
-		this.type = type;
-	}
 
 }

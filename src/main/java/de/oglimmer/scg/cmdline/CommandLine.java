@@ -1,73 +1,73 @@
 package de.oglimmer.scg.cmdline;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import lombok.extern.slf4j.Slf4j;
+import lombok.Getter;
 import de.oglimmer.scg.core.Game;
 import de.oglimmer.scg.core.GameEndException;
 import de.oglimmer.scg.core.Player;
-import de.oglimmer.scg.printer.PrinterDebug;
-import de.oglimmer.scg.printer.PrinterGame;
+import de.oglimmer.scg.printer.PrinterDebugGame;
 
-@Slf4j
 public class CommandLine {
 
 	public static void main(String[] args) {
 		CommandLine cl = new CommandLine();
-		cl.runGame();
+		cl.processLoop.loop();
 	}
 
-	private boolean running;
-
+	@Getter
 	private Game game;
 
+	private ProcessLoop processLoop = new ProcessLoop(this);
+
 	public CommandLine() {
+		createGame();
+	}
+
+	private void createGame() {
 		game = new Game();
-		game.addPlayer("a@test.com");
-		game.addPlayer("b@test.com");
-		game.addPlayer("c@test.com");
-		game.addPlayer("d@test.com");
+		game.addPlayer("a");
+		game.addPlayer("b");
+		game.addPlayer("c");
+		game.addPlayer("d");
 		game.start();
 	}
 
-	private void runGame() {
-		running = true;
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			while (running) {
-				PrinterGame pg = new PrinterGame(game);
-				pg.printTable();
-				System.out.println(pg.toString() + "$");
-				String commandLine = br.readLine();
-				parse(commandLine);
-			}
-		} catch (IOException e) {
-			log.error("Failed to read from console", e);
-		} catch (GameEndException e) {
-			System.out.println(e.getMessage());
+	public void parse(String commandLine) throws GameEndException {
+		String[] turnData = commandLine.split("-");
+		if (Character.valueOf('x').equals(turnData[0])) {
+			executeQuit();
+		} else if (Character.valueOf('d').equals(turnData[0])) {
+			executeDebugOut();
+		} else {
+			processUserTurn(turnData);
 		}
 	}
 
-	private void parse(String commandLine) throws GameEndException {
-		// card-param
-		String[] turnData = commandLine.split("-");
-		if (turnData[0].equals("x")) {
-			running = false;
-		} else if (turnData[0].equals("d")) {
-			System.out.println("---");
-			PrinterDebug pd = new PrinterDebug(game);
-			pd.debugPrint();
-			System.out.println(pd.toString());
-			System.out.println("---");
-		} else {
-			Player currentPlayer = game.getCurrentPlayer();
-			if (game.play(turnData)) {
-				System.out.println(currentPlayer.getMessages().getAll());
-				System.out.println("---");
-				System.out.println(game.getCurrentPlayer().getMessages().getAll());
-			}
+	private void processUserTurn(String[] turnData) throws GameEndException {
+		if (exeucteUserTurn(turnData)) {
+			outputUserTurn();
 		}
+	}
+
+	private void outputUserTurn() {
+		Player currentPlayer = game.getTurn().getCurrentPlayer();
+		System.out.println(currentPlayer.getMessages().getAll());
+		System.out.println("---");
+		System.out.println(currentPlayer.getMessages().getAll());
+	}
+
+	private boolean exeucteUserTurn(String[] turnData) throws GameEndException {
+		return game.getTurn().getPlay(turnData).play();
+	}
+
+	private void executeDebugOut() {
+		System.out.println("---");
+		PrinterDebugGame pd = new PrinterDebugGame(game);
+		pd.debugPrint();
+		System.out.println(pd.toString());
+		System.out.println("---");
+	}
+
+	private void executeQuit() {
+		processLoop.setRunning(false);
 	}
 }

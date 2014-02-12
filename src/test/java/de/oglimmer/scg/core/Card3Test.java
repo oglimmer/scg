@@ -3,7 +3,6 @@ package de.oglimmer.scg.core;
 import static de.oglimmer.scg.core.ScgMatcher.isAlive;
 import static de.oglimmer.scg.core.ScgMatcher.isDead;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +27,8 @@ public class Card3Test {
 		playerOwner.getCardHand().addCard(card, Type.DRAWN);
 		playerOther.getCardHand().addCard(Card.get(1), Type.HAND);
 
-		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
+		card.play(playerOther.getNo(), null);
 
-		assertThat(removeAfterPlay, is(true));
 		assertThat(playerOwner, isAlive());
 		assertThat(playerOther, isDead());
 	}
@@ -41,9 +39,8 @@ public class Card3Test {
 		playerOwner.getCardHand().addCard(card, Type.DRAWN);
 		playerOther.getCardHand().addCard(Card.get(5), Type.HAND);
 
-		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
+		card.play(playerOther.getNo(), null);
 
-		assertThat(removeAfterPlay, is(true));
 		assertThat(playerOwner, isDead());
 		assertThat(playerOther, isAlive());
 	}
@@ -54,9 +51,8 @@ public class Card3Test {
 		playerOwner.getCardHand().addCard(card, Type.DRAWN);
 		playerOther.getCardHand().addCard(Card.get(1), Type.HAND);
 
-		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
+		card.play(playerOther.getNo(), null);
 
-		assertThat(removeAfterPlay, is(true));
 		assertThat(playerOwner, isAlive());
 		assertThat(playerOther, isDead());
 	}
@@ -67,9 +63,8 @@ public class Card3Test {
 		playerOwner.getCardHand().addCard(card, Type.DRAWN);
 		playerOther.getCardHand().addCard(Card.get(8), Type.HAND);
 
-		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
+		card.play(playerOther.getNo(), null);
 
-		assertThat(removeAfterPlay, is(true));
 		assertThat(playerOwner, isDead());
 		assertThat(playerOther, isAlive());
 	}
@@ -80,9 +75,8 @@ public class Card3Test {
 		playerOwner.getCardHand().addCard(card, Type.DRAWN);
 		playerOther.getCardHand().addCard(Card.get(7), Type.HAND);
 
-		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
+		card.play(playerOther.getNo(), null);
 
-		assertThat(removeAfterPlay, is(true));
 		assertThat(playerOwner, isAlive());
 		assertThat(playerOther, isAlive());
 	}

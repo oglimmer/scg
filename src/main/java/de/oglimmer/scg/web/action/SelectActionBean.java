@@ -8,8 +8,8 @@ import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import de.oglimmer.scg.core.Game;
 import de.oglimmer.scg.core.Player;
-import de.oglimmer.scg.printer.PrinterGame;
-import de.oglimmer.scg.printer.PrinterGameHtml;
+import de.oglimmer.scg.printer.PrinterGamePlan;
+import de.oglimmer.scg.printer.PrinterGamePlanHtml;
 import de.oglimmer.scg.web.GameManager;
 
 @Data
@@ -24,30 +24,57 @@ public class SelectActionBean extends BaseAction {
 
 	@DefaultHandler
 	public Resolution show() {
-
 		Game game = GameManager.INSTANCE.getGame(gid);
 		if (game != null) {
-
-			Player player = game.getPlayer(pid);
-			if (player.isDead()) {
-				return new ForwardResolution("/WEB-INF/jsp/dead.jsp");
-			} else {
-				if (pid.equals(game.getCurrentPlayer().getId())) {
-
-					PrinterGame printGame = new PrinterGameHtml(game);
-					printGame.printTable();
-					response = printGame.toString();
-
-					response = response.replace(PrinterGame.CR, "<br/>");
-
-					return new ForwardResolution("/WEB-INF/jsp/do.jsp");
-				} else {
-					return new ForwardResolution("/WEB-INF/jsp/noTurn.jsp");
-				}
-			}
+			return showGame(game);
 		} else {
-			return new RedirectResolution(LandingActionBean.class);
+			return getNoGameFoundResolution();
 		}
+	}
+
+	private Resolution showGame(Game game) {
+		Player player = game.getPlayer(pid);
+		if (player.isDead()) {
+			return getPlayerDeadResolution();
+		} else {
+			return showPlayer(game);
+		}
+	}
+
+	private Resolution showPlayer(Game game) {
+		if (isPlayersTurn(game)) {
+			buildResponse(game);
+			return getDisplayTurnResolution();
+		} else {
+			return getNoTurnResolution();
+		}
+	}
+
+	private Resolution getNoTurnResolution() {
+		return new ForwardResolution("/WEB-INF/jsp/noTurn.jsp");
+	}
+
+	private boolean isPlayersTurn(Game game) {
+		return pid.equals(game.getTurn().getCurrentPlayer().getId());
+	}
+
+	private Resolution getDisplayTurnResolution() {
+		return new ForwardResolution("/WEB-INF/jsp/do.jsp");
+	}
+
+	private void buildResponse(Game game) {
+		PrinterGamePlan printGame = new PrinterGamePlanHtml(game);
+		printGame.printTable();
+		response = printGame.toString();
+		response = response.replace(PrinterGamePlan.CR, "<br/>");
+	}
+
+	private Resolution getPlayerDeadResolution() {
+		return new ForwardResolution("/WEB-INF/jsp/dead.jsp");
+	}
+
+	private Resolution getNoGameFoundResolution() {
+		return new RedirectResolution(LandingActionBean.class);
 	}
 
 }
