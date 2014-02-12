@@ -18,6 +18,8 @@ public class IsTargetValidTest {
 	@Mock
 	private Game game;
 	@Mock
+	private Turn turn;
+	@Mock
 	private Player playerOwner;
 	@Mock
 	private Player playerOther;
@@ -34,7 +36,8 @@ public class IsTargetValidTest {
 		when(playerOwner.isCurrentPlayer()).thenReturn(true);
 		when(playerOther.isCurrentPlayer()).thenReturn(false);
 
-		when(game.getTurn().getCurrentPlayer()).thenReturn(playerOwner);
+		when(game.getTurn()).thenReturn(turn);
+		when(turn.getCurrentPlayer()).thenReturn(playerOwner);
 		when(game.getPlayer(0)).thenReturn(playerOwner);
 		when(game.getPlayer(1)).thenReturn(playerOther);
 		when(game.getPlayers()).thenReturn(Arrays.asList(new Player[] { playerOwner, playerOther }));
