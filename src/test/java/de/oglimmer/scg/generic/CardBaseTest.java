@@ -1,12 +1,14 @@
 package de.oglimmer.scg.generic;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.junit.Assert;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.oglimmer.scg.core.Card;
@@ -103,12 +105,12 @@ public class CardBaseTest {
 		}
 
 		private void validateResult() {
-			Assert.assertEquals(expectedResult.toString(), expectedResult.isPlayResult(), playResult);
+			assertThat(expectedResult.toString(), playResult, is(expectedResult.isPlayResult()));
 		}
 
 		private void validteDetails() {
-			Assert.assertEquals(expectedResult.toString(), expectedResult.isPlayerADead(), playerA.isDead());
-			Assert.assertEquals(expectedResult.toString(), expectedResult.isPlayerBDead(), playerB.isDead());
+			assertThat(expectedResult.toString(), playerA.isDead(), is(expectedResult.isPlayerADead()));
+			assertThat(expectedResult.toString(), playerB.isDead(), is(expectedResult.isPlayerBDead()));
 			validatePlayerA();
 			validatePlayerB();
 		}
@@ -118,8 +120,7 @@ public class CardBaseTest {
 				validatePlayer(playerA);
 				if (expectedResult.getPlayerAOpen() != null) {
 					Card cardOpen = playerA.getCardHand().getCard(Type.OPEN).getCard();
-					Assert.assertEquals(expectedResult.toString(), expectedResult.getPlayerAOpen(),
-							(Integer) cardOpen.getNo());
+					assertThat(expectedResult.toString(), cardOpen.getNo(), is(expectedResult.getPlayerAOpen()));
 				}
 			}
 		}
@@ -132,7 +133,7 @@ public class CardBaseTest {
 
 		private void validatePlayer(Player player) {
 			Card cardHand = player.getCardHand().getCard(Type.HAND).getCard();
-			Assert.assertEquals(expectedResult.toString(), getHandForPlayer(player), cardHand.getNo());
+			assertThat(expectedResult.toString(), cardHand.getNo(), is(getHandForPlayer(player)));
 		}
 
 		private int getHandForPlayer(Player player) {

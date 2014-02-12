@@ -1,6 +1,10 @@
 package de.oglimmer.scg.core;
 
-import org.junit.Assert;
+import static de.oglimmer.scg.core.ScgMatcher.isAlive;
+import static de.oglimmer.scg.core.ScgMatcher.isDead;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,9 +30,9 @@ public class Card3Test {
 
 		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
 
-		Assert.assertEquals(true, removeAfterPlay);
-		Assert.assertEquals(false, playerOwner.isDead());
-		Assert.assertEquals(true, playerOther.isDead());
+		assertThat(removeAfterPlay, is(true));
+		assertThat(playerOwner, isAlive());
+		assertThat(playerOther, isDead());
 	}
 
 	@Test
@@ -39,9 +43,9 @@ public class Card3Test {
 
 		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
 
-		Assert.assertEquals(true, removeAfterPlay);
-		Assert.assertEquals(true, playerOwner.isDead());
-		Assert.assertEquals(false, playerOther.isDead());
+		assertThat(removeAfterPlay, is(true));
+		assertThat(playerOwner, isDead());
+		assertThat(playerOther, isAlive());
 	}
 
 	@Test
@@ -52,9 +56,9 @@ public class Card3Test {
 
 		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
 
-		Assert.assertEquals(true, removeAfterPlay);
-		Assert.assertEquals(false, playerOwner.isDead());
-		Assert.assertEquals(true, playerOther.isDead());
+		assertThat(removeAfterPlay, is(true));
+		assertThat(playerOwner, isAlive());
+		assertThat(playerOther, isDead());
 	}
 
 	@Test
@@ -65,9 +69,9 @@ public class Card3Test {
 
 		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
 
-		Assert.assertEquals(true, removeAfterPlay);
-		Assert.assertEquals(true, playerOwner.isDead());
-		Assert.assertEquals(false, playerOther.isDead());
+		assertThat(removeAfterPlay, is(true));
+		assertThat(playerOwner, isDead());
+		assertThat(playerOther, isAlive());
 	}
 
 	@Test
@@ -78,9 +82,9 @@ public class Card3Test {
 
 		boolean removeAfterPlay = card.play(playerOther.getNo(), null);
 
-		Assert.assertEquals(true, removeAfterPlay);
-		Assert.assertEquals(false, playerOwner.isDead());
-		Assert.assertEquals(false, playerOther.isDead());
+		assertThat(removeAfterPlay, is(true));
+		assertThat(playerOwner, isAlive());
+		assertThat(playerOther, isAlive());
 	}
 
 }

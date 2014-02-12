@@ -1,12 +1,13 @@
 package de.oglimmer.scg.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -83,7 +84,8 @@ public class IsTargetValidTest {
 
 		boolean targetValid = card.isTargetValid(targetPlayer.getNo());
 
-		Assert.assertEquals(expected, targetValid);
+		assertThat(targetValid, is(expected));
+
 		verifyNoMoreInteractions(ignoreStubs(game));
 		verifyNoMoreInteractions(ignoreStubs(playerOwner));
 		verifyNoMoreInteractions(ignoreStubs(playerOther));

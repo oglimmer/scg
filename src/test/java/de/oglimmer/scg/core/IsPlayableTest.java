@@ -1,5 +1,7 @@
 package de.oglimmer.scg.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -8,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -96,7 +97,8 @@ public class IsPlayableTest {
 
 		boolean effective = card.isPlayable();
 
-		Assert.assertEquals(expected, effective);
+		assertThat(effective, is(expected));
+
 		verifyNoMoreInteractions(ignoreStubs(game));
 		verifyNoMoreInteractions(ignoreStubs(playerOwner));
 	}

@@ -1,8 +1,12 @@
 package de.oglimmer.scg.core;
 
+import static de.oglimmer.scg.core.ScgMatcher.isAlive;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+
 import java.util.Iterator;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class Card5Test {
@@ -27,11 +31,14 @@ public class Card5Test {
 
 		boolean playResult = game.play(new String[] { "2", "1" });
 
-		Assert.assertEquals(true, playResult);
-		Assert.assertEquals(1, a.getCardHand().getCards().size());
+		assertThat(playResult, is(true));
+		assertThat(a, isAlive());
+		assertThat(b, isAlive());
+
+		assertThat(a.getCardHand().getCards(), hasSize(1));
 		AssociatedCard ac = a.getCardHand().getCards().iterator().next();
-		Assert.assertEquals(Card.get(5), ac.getCard());
-		Assert.assertEquals(Type.HAND, ac.getType());
+		assertThat(ac.getCard(), is(Card.get(5)));
+		assertThat(ac.getType(), is(Type.HAND));
 	}
 
 }

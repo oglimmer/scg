@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import de.oglimmer.scg.email.EmailSender;
 
 @Data
-@ToString(exclude = "game")
+@ToString(exclude = { "game", "messages" })
 @Slf4j
 public class Player implements Serializable {
 
