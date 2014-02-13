@@ -1,13 +1,11 @@
 package de.oglimmer.scg.web;
 
-import de.oglimmer.scg.core.Card;
 import de.oglimmer.scg.core.Game;
 import de.oglimmer.scg.core.GameEndException;
+import de.oglimmer.scg.core.Messages;
 import de.oglimmer.scg.core.Play;
 import de.oglimmer.scg.core.Player;
-import de.oglimmer.scg.core.Type;
 import de.oglimmer.scg.email.EmailSender;
-import de.oglimmer.scg.printer.PrinterGamePlan;
 
 public class WebTurn {
 
@@ -21,11 +19,11 @@ public class WebTurn {
 
 		game = GameManager.INSTANCE.getGame(gameId);
 		if (game == null) {
-			throw new RuntimeException(gameId + " does not exist.");
+			throw new RedirectException(gameId + " does not exist.", "Landing.action");
 		}
 		currentPlayer = game.getPlayer(playerId);
 		if (!currentPlayer.isCurrentPlayer()) {
-			throw new RuntimeException(playerId + " is not the current player");
+			throw new RedirectException(playerId + " is not the current player", "Landing.action");
 		}
 	}
 
@@ -70,61 +68,15 @@ public class WebTurn {
 	}
 
 	private void processGameEnd(GameEndException e) {
+		Messages.addTo(String.format("Game is over. Winner is: %s", e.getWinner()), game);
+		getLastTurnsMessages();
+		game.getTurn().setCurrentPlayer(null);
 		for (Player p : game.getPlayers()) {
-			GameEndTextBuilder getb = new GameEndTextBuilder();
+			GameEndTextBuilder getb = new GameEndTextBuilder(game);
 			getb.buildGameEndText(e, p);
 			EmailSender.sendPlain(p, "Game Ended", getb.toString());
 		}
-		GameManager.INSTANCE.removeGameMemoryAndFile(game);
-	}
-
-	class GameEndTextBuilder {
-		StringBuilder buff = new StringBuilder();
-
-		void buildGameEndText(GameEndException e, Player emailTarget) {
-			addExceptionText(e);
-			addHandcardHeader();
-			for (Player gamePlayer : game.getPlayers()) {
-				addHandcardForPlayer(gamePlayer);
-			}
-			addAllActions(emailTarget);
-		}
-
-		private void addAllActions(Player emailTarget) {
-			buff.append(PrinterGamePlan.CR + PrinterGamePlan.CR);
-			buff.append("The game:");
-			buff.append(PrinterGamePlan.CR);
-			buff.append(emailTarget.getMessages().getAll());
-		}
-
-		private void addHandcardForPlayer(Player gamePlayer) {
-			buff.append(gamePlayer.getDisplayName());
-			buff.append(" => ");
-			if (gamePlayer.isDead()) {
-				buff.append("dead");
-			} else {
-				Card handCard = gamePlayer.getCardHand().getCard(Type.HAND);
-				buff.append(handCard.getName());
-				buff.append(" (");
-				buff.append(handCard.getNo());
-				buff.append(")");
-			}
-			buff.append(PrinterGamePlan.CR);
-		}
-
-		private void addHandcardHeader() {
-			buff.append(PrinterGamePlan.CR + PrinterGamePlan.CR);
-			buff.append("Handcards of the players:");
-			buff.append(PrinterGamePlan.CR);
-		}
-
-		private void addExceptionText(GameEndException e) {
-			buff.append(e.getMessage());
-		}
-
-		public String toString() {
-			return buff.toString();
-		}
+		// GameManager.INSTANCE.removeGameMemoryAndFile(game);
 	}
 
 }

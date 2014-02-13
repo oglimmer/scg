@@ -5,7 +5,7 @@
 <s:layout-render name="/WEB-INF/jsp/common/main_layout.jsp">
 	<s:layout-component name="center">
 
-		<div>You are dead.</div>
+		<div>You died.</div>
 		
 		<div>
 			${actionBean.response }

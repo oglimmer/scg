@@ -31,7 +31,6 @@ public class Turn implements Serializable {
 		determineNextPlayer();
 		currentPlayer.getCardHand().putOpenCardsToOpenStack();
 		currentPlayer.getCardHand().addCard(game.getStackHidden().takeTop(), Type.DRAWN);
-		game.persist();
 		incTurnNo();
 	}
 
@@ -59,13 +58,19 @@ public class Turn implements Serializable {
 
 	public void reStart() {
 		start();
-		while (playerIterator.next().getNo() != currentPlayer.getNo()) {
-			// next() already used
+		if (currentPlayer != null) {
+			while (playerIterator.next().getNo() != currentPlayer.getNo()) {
+				// next() already used
+			}
 		}
 	}
 
 	public Play getPlay(String[] cmdLine) {
 		return new Play(this, cmdLine);
+	}
+
+	public boolean isGameEnded() {
+		return currentPlayer == null;
 	}
 
 }

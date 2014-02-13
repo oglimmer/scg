@@ -36,7 +36,7 @@ public class ProcessLoop {
 	}
 
 	private void processEndOfGame(GameEndException e) {
-		System.out.println(e.getMessage());
+		System.out.println("Game over. Winner is:" + e.getWinner());
 	}
 
 	private void handleIOException(IOException e) {

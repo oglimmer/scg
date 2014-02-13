@@ -5,6 +5,11 @@
 	id="WebApp_ID" version="3.0">
 
 	<display-name>SimpleCardGame</display-name>
+	
+	<absolute-ordering>
+		<name>StripesFilter</name>
+		<name>RedirectExceptionFilter</name>
+	</absolute-ordering>
 
 	<filter>
 		<display-name>Stripes Filter</display-name>
@@ -18,8 +23,12 @@
 			<param-name>Extension.Packages</param-name>
 			<param-value>de.oglimmer.scg.web.ext</param-value>
 		</init-param>
+		<init-param>
+    		<param-name>ExceptionHandler.Class</param-name>
+    		<param-value>de.oglimmer.scg.web.ScgExceptionHandler</param-value>
+		</init-param>
 	</filter>
-
+		
 	<filter-mapping>
 		<filter-name>StripesFilter</filter-name>
 		<url-pattern>*.jsp</url-pattern>
@@ -31,7 +40,7 @@
 		<servlet-name>StripesDispatcher</servlet-name>
 		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
-
+	
 	<servlet>
 		<servlet-name>StripesDispatcher</servlet-name>
 		<servlet-class>net.sourceforge.stripes.controller.DispatcherServlet</servlet-class>

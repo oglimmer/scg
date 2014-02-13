@@ -34,8 +34,11 @@ public class PrinterDebugGame {
 
 	private void addGameData() {
 		buff.append("GameId:").append(game.getId()).append(PrinterGamePlan.CR);
-		buff.append("current:").append(game.getTurn().getCurrentPlayer().getNo()).append('/')
-				.append(game.getTurn().getCurrentPlayer().getEmail()).append(PrinterGamePlan.CR);
+		Player currentPlayer = game.getTurn().getCurrentPlayer();
+		if (currentPlayer != null) {
+			buff.append("current:").append(currentPlayer.getNo()).append('/').append(currentPlayer.getEmail())
+					.append(PrinterGamePlan.CR);
+		}
 	}
 
 	private void addPlayer(Player p) {

@@ -1,7 +1,9 @@
 package de.oglimmer.scg.core;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 public class WinCondition {
 
@@ -9,16 +11,21 @@ public class WinCondition {
 
 	public void checkWinner() throws GameEndException {
 		new WinnerLastManStanding().check();
-		new checkWinnerNoCards().check();
+		new CheckWinnerNoCards().check();
 	}
 
-	class checkWinnerNoCards {
+	private void throwGameEndException(String winner) throws GameEndException {
+		throw new GameEndException(winner);
+	}
+
+	class CheckWinnerNoCards {
 		private int maxCardNo;
 		private String winner;
 
 		void check() throws GameEndException {
 			if (checkWinCondition()) {
 				findPlayerWithMaxCard();
+				log.debug("Game {} ended no cards left. {}", game.getId(), winner);
 				throwGameEndException(winner);
 			}
 		}
@@ -78,12 +85,10 @@ public class WinCondition {
 
 		private void checkWinCondition() throws GameEndException {
 			if (playerAlive < 2) {
+				log.debug("Game {} ended player alive < 2. {}", game.getId(), aPlayerAlive);
 				throwGameEndException(aPlayerAlive);
 			}
 		}
 	}
 
-	private void throwGameEndException(String winner) throws GameEndException {
-		throw new GameEndException("Game over. Winner is : " + winner);
-	}
 }

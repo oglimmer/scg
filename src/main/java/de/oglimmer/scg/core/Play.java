@@ -35,14 +35,18 @@ public class Play {
 	}
 
 	private void playValid() throws GameEndException {
-		changePlayedCardToInPlay();
-		playCard();
-		if (!cardToPlay.isEnduring()) {
-			movePlayedCardToOpenStack();
+		try {
+			changePlayedCardToInPlay();
+			playCard();
+			if (!cardToPlay.isEnduring()) {
+				movePlayedCardToOpenStack();
+			}
+			changeDrawnCardToInHand();
+			checkWinCondition();
+			nextTurn();
+		} finally {
+			turn.getGame().persist();
 		}
-		changeDrawnCardToInHand();
-		checkWinCondition();
-		nextTurn();
 	}
 
 	private void playCard() {

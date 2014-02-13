@@ -4,6 +4,11 @@
 
 <s:layout-render name="/WEB-INF/jsp/common/main_layout.jsp">
 	<s:layout-component name="center">
+	
+		<c:if test="${actionBean.game.turn.gameEnded}">
+			<h2>Game Ended!</h2>
+			${actionBean.gameWinner }
+		</c:if>
 
 		<h3>
 			Players:

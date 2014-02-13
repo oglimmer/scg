@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import de.oglimmer.scg.core.Game;
 import de.oglimmer.scg.core.Player;
@@ -39,14 +40,22 @@ public class DoActionBean extends BaseAction {
 	private Resolution findResolution() {
 		Game game = GameManager.INSTANCE.getGame(gid);
 		if (game != null) {
+			return findResolution(game);
+		} else {
+			return getLandingRedirect();
+		}
+	}
+
+	private Resolution findResolution(Game game) {
+		if (game.getTurn().isGameEnded()) {
+			return getGameEndedView();
+		} else {
 			Player player = game.getPlayer(pid);
 			if (player.isDead()) {
 				return getPlayerDeadView();
 			} else {
 				return getTurnResultView();
 			}
-		} else {
-			return getGameEndedView();
 		}
 	}
 
@@ -62,12 +71,17 @@ public class DoActionBean extends BaseAction {
 		return new ForwardResolution("/WEB-INF/jsp/gameover.jsp");
 	}
 
+	private Resolution getLandingRedirect() {
+		return new RedirectResolution(LandingActionBean.class);
+	}
+
 	class CommandString {
 
 		private StringBuilder commandString = new StringBuilder();
 
 		String execute() {
-			String response = new WebTurn(gid, pid, commandString.toString()).process();
+			WebTurn webTurn = new WebTurn(gid, pid, commandString.toString());
+			String response = webTurn.process();
 			if (response != null) {
 				response = response.replace(PrinterGamePlan.CR, "<br/>");
 			}

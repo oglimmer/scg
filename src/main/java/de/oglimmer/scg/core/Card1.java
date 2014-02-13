@@ -86,7 +86,8 @@ public class Card1 extends TargetableCard {
 		}
 
 		void addMsgMiss() {
-			String msgPlayer = String.format("Your guess (%s) was wrong.", guessedCard.getName());
+			String msgPlayer = String.format("Your guess (%s) for %s was wrong.", guessedCard.getName(),
+					targetPlayer.getDisplayName());
 			String msgTargetPlayer = String.format(
 					"The player %s has tried to kill you with %s, but failed. He guessed %s.", player.getDisplayName(),
 					getName(), guessedCard.getName());

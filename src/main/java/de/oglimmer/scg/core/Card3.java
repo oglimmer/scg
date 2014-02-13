@@ -43,15 +43,23 @@ public class Card3 extends TargetableCard {
 		private void processTurn() {
 			log.debug("Card3 played from {} with {} on {} with {}", getOwner(), targetPlayer, originPlayersOtherCard,
 					targetPlayersHandCard);
-			if (originPlayersOtherCard.getNo() > targetPlayersHandCard.getNo()) {
+			if (isOriginPlayerWins()) {
 				msg.addMsgTargetKilled();
 				targetPlayer.killPlayer();
-			} else if (originPlayersOtherCard.getNo() < targetPlayersHandCard.getNo()) {
+			} else if (isTargetPlayerWins()) {
 				msg.addMsgInitiatorKilled();
 				getOwner().killPlayer();
 			} else {
 				msg.addMsgTie();
 			}
+		}
+
+		private boolean isTargetPlayerWins() {
+			return originPlayersOtherCard.getNo() < targetPlayersHandCard.getNo();
+		}
+
+		private boolean isOriginPlayerWins() {
+			return originPlayersOtherCard.getNo() > targetPlayersHandCard.getNo();
 		}
 
 		private Card getOriginPlayersOtherCard() {
@@ -166,7 +174,7 @@ public class Card3 extends TargetableCard {
 		}
 
 		protected String addWhoDidWhat() {
-			return String.format("%s played %s against you", initiator.getDisplayName(), getName());
+			return String.format("%s played %s against you.", initiator.getDisplayName(), getName());
 		}
 
 		protected String addTargetGotKilled() {

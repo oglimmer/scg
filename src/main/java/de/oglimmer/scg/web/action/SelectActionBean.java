@@ -20,6 +20,7 @@ import de.oglimmer.scg.core.Player;
 import de.oglimmer.scg.printer.PrinterGamePlan;
 import de.oglimmer.scg.printer.PrinterPlayerPlan;
 import de.oglimmer.scg.printer.PrinterPlayerPlanHtml;
+import de.oglimmer.scg.web.GameEndTextBuilder;
 import de.oglimmer.scg.web.GameManager;
 
 @Data
@@ -37,6 +38,14 @@ public class SelectActionBean extends BaseAction {
 	private Map<String, Integer> usedCards;
 	private int undisclosedCards;
 
+	private Game game;
+
+	public String getGameWinner() {
+		GameEndTextBuilder getb = new GameEndTextBuilder(game);
+		getb.buildGameEndText();
+		return getb.toString().replace(PrinterGamePlan.CR, "<br/>");
+	}
+
 	public Card getCard(int no) {
 		return Card.get(no);
 	}
@@ -47,15 +56,15 @@ public class SelectActionBean extends BaseAction {
 
 	@DefaultHandler
 	public Resolution show() {
-		Game game = GameManager.INSTANCE.getGame(gid);
+		game = GameManager.INSTANCE.getGame(gid);
 		if (game != null) {
-			return showGame(game);
+			return showGame();
 		} else {
 			return getNoGameFoundResolution();
 		}
 	}
 
-	private Resolution showGame(Game game) {
+	private Resolution showGame() {
 		Player callingPlayer = game.getPlayer(pid);
 		return showPlayer(callingPlayer);
 	}
