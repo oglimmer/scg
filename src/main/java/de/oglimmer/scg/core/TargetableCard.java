@@ -13,7 +13,15 @@ public abstract class TargetableCard extends Card {
 		if (isEffective(targetPlayerNo)) {
 			Player targetPlayer = getOwner().getGame().getPlayer(targetPlayerNo);
 			playOnTarget(targetPlayer, targetCardNo);
+		} else {
+			addMessageNoEffect();
 		}
+	}
+
+	private void addMessageNoEffect() {
+		Messages.addTo("You have played " + getName() + " against your self, but this has no effect.", getOwner());
+		Messages.addNotTo("Player " + getOwner().getDisplayName() + " played " + getName()
+				+ " against himself, but this had no effect.", getOwner());
 	}
 
 	public abstract void playOnTarget(Player targetPlayer, Integer targetCardNo);

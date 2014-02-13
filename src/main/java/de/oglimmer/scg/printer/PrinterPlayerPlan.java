@@ -21,11 +21,11 @@ public class PrinterPlayerPlan {
 		} else {
 			buff.append("You are ");
 		}
-		addOtherPlayer();
+		addStatus();
 		buff.append(PrinterGamePlan.CR);
 	}
 
-	protected void addOtherPlayer() {
+	public void addStatus() {
 		if (player.isDead()) {
 			buff.append("dead");
 		} else {
@@ -66,7 +66,7 @@ public class PrinterPlayerPlan {
 		}
 	}
 
-	private void addCard(AssociatedCard ac) {
+	public void addCard(AssociatedCard ac) {
 		Card card = ac.getCard();
 		addCardType(ac);
 		addCardText(card);

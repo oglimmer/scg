@@ -31,14 +31,7 @@
 
 		<h1>Cards</h1>
 		
-		<img src="images/card1.png"/>
-		<img src="images/card2.png"/>
-		<img src="images/card3.png"/>
-		<img src="images/card4.png"/>
-		<img src="images/card5.png"/>
-		<img src="images/card6.png"/>
-		<img src="images/card7.png"/>
-		<img src="images/card8.png"/>
+		<%@include file="/WEB-INF/jsp/common/card_overview.jsp"%>
 		
 		<div>
 			&nbsp;

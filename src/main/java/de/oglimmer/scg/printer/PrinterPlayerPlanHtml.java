@@ -23,7 +23,7 @@ public class PrinterPlayerPlanHtml extends PrinterPlayerPlan {
 		} else {
 			buff.append("You are ");
 		}
-		addOtherPlayer();
+		addStatus();
 		buff.append(PrinterGamePlan.CR);
 	}
 
@@ -37,7 +37,8 @@ public class PrinterPlayerPlanHtml extends PrinterPlayerPlan {
 		buff.append("</tr></table>");
 	}
 
-	private void addCard(AssociatedCard ac) {
+	@Override
+	public void addCard(AssociatedCard ac) {
 		buff.append("<td style='vertical-align: top'><form action='").append(ScgProperties.INSTANCE.getHttpHost())
 				.append("/Do.action'>");
 		buff.append("<input type='hidden' name='gid' value='").append(player.getGame().getId()).append("'>");

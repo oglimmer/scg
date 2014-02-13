@@ -2,6 +2,7 @@ package de.oglimmer.scg.core;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,6 +32,15 @@ public class Game implements Serializable {
 	private Turn turn = new Turn(this);
 
 	private boolean autoSave;
+
+	private void readObject(ObjectInputStream ios) throws ClassNotFoundException, IOException {
+		ios.defaultReadObject();
+		turn.reStart();
+	}
+
+	private void writeObject(ObjectOutputStream oos) throws IOException {
+		oos.defaultWriteObject();
+	}
 
 	public Player getPlayer(int playerNo) {
 		for (Player p : players) {

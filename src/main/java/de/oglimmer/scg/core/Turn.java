@@ -1,8 +1,5 @@
 package de.oglimmer.scg.core;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Iterator;
 
@@ -28,18 +25,6 @@ public class Turn implements Serializable {
 
 	public Turn(Game game) {
 		this.game = game;
-	}
-
-	private void readObject(ObjectInputStream ios) throws ClassNotFoundException, IOException {
-		ios.defaultReadObject();
-		playerIterator = game.getPlayers().iterator();
-		while (playerIterator.next().getNo() != currentPlayer.getNo()) {
-			// next() already used
-		}
-	}
-
-	private void writeObject(ObjectOutputStream oos) throws IOException {
-		oos.defaultWriteObject();
 	}
 
 	public void nextTurn() {
@@ -70,6 +55,13 @@ public class Turn implements Serializable {
 
 	public void start() {
 		playerIterator = game.getPlayers().iterator();
+	}
+
+	public void reStart() {
+		start();
+		while (playerIterator.next().getNo() != currentPlayer.getNo()) {
+			// next() already used
+		}
 	}
 
 	public Play getPlay(String[] cmdLine) {

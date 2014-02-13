@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.oglimmer.scg.printer.PrinterGamePlan;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import de.oglimmer.scg.printer.PrinterGamePlan;
 
 @Slf4j
 @ToString(exclude = "game")
@@ -74,16 +74,17 @@ public class Messages implements Serializable {
 	public String getAllHtml() {
 		StringBuilder buff = new StringBuilder();
 		for (Message msg : messages) {
-			buff.append("<li>").append(msg.getMsg()).append("</li>");
+			buff.append("<li>").append(msg.getMsg()).append("</li>");//append(msg.getTurn()).append(" - ")
 		}
 		return buff.toString();
 	}
 
 	@Data
 	@AllArgsConstructor
-	static class Message implements Serializable {
+	public static class Message implements Serializable {
 		private static final long serialVersionUID = 1L;
 		private String msg;
 		private int turn;
 	}
+
 }

@@ -18,9 +18,7 @@ import de.oglimmer.scg.web.WebTurn;
 public class DoActionBean extends BaseAction {
 
 	private String gid;
-
 	private String pid;
-
 	private String card;
 
 	private String player;
@@ -70,7 +68,9 @@ public class DoActionBean extends BaseAction {
 
 		String execute() {
 			String response = new WebTurn(gid, pid, commandString.toString()).process();
-			response = response.replace(PrinterGamePlan.CR, "<br/>");
+			if (response != null) {
+				response = response.replace(PrinterGamePlan.CR, "<br/>");
+			}
 			return response;
 		}
 

@@ -20,6 +20,9 @@ public class WebTurn {
 		this.firstRow = firstRow.split("-");
 
 		game = GameManager.INSTANCE.getGame(gameId);
+		if (game == null) {
+			throw new RuntimeException(gameId + " does not exist.");
+		}
 		currentPlayer = game.getPlayer(playerId);
 		if (!currentPlayer.isCurrentPlayer()) {
 			throw new RuntimeException(playerId + " is not the current player");
@@ -59,7 +62,7 @@ public class WebTurn {
 	}
 
 	private void sendEmailNextPlayer() {
-		EmailSender.sendTurn(game.getTurn() .getCurrentPlayer(), "Your Turn", game);
+		EmailSender.sendTurn(game.getTurn().getCurrentPlayer(), "Your Turn", game);
 	}
 
 	private void getLastTurnsMessages() {
