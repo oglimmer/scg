@@ -77,7 +77,7 @@ public class PrinterGamePlan {
 		return first;
 	}
 
-	private Map<String, Integer> aggregateDataUsedCards() {
+	public Map<String, Integer> aggregateDataUsedCards() {
 		Map<String, Integer> map = new HashMap<>();
 		for (Card c : game.getStackOpen().getCards()) {
 			Integer i = map.get(c.getName());

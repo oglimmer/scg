@@ -17,7 +17,7 @@
 		</h3>
 		<table>
 			<tr>
-				<c:forEach var="card" items="${actionBean.currentPlayersCards }">
+				<c:forEach var="card" items="${actionBean.callingPlayersCards }">
 					<td><img src="images/card${card.no }.png"/></td>
 				</c:forEach>
 			</tr>
@@ -37,7 +37,7 @@
 			Last actions:
 		</h3>	
 		<ol>
-			${actionBean.messages.allHtml }
+			${actionBean.callingPlayersMessages.allHtml }
 		</ol> 
 		
 		

@@ -2,7 +2,6 @@ package de.oglimmer.scg.web.action;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
@@ -18,6 +17,7 @@ import de.oglimmer.scg.core.CardStack;
 import de.oglimmer.scg.core.Game;
 import de.oglimmer.scg.core.Messages;
 import de.oglimmer.scg.core.Player;
+import de.oglimmer.scg.printer.PrinterGamePlan;
 import de.oglimmer.scg.printer.PrinterPlayerPlan;
 import de.oglimmer.scg.printer.PrinterPlayerPlanHtml;
 import de.oglimmer.scg.web.GameManager;
@@ -30,11 +30,11 @@ public class SelectActionBean extends BaseAction {
 	private String pid;
 
 	private Collection<PlayerWeb> players;
-	private Collection<CardWeb> currentPlayersCards;
+	private Collection<CardWeb> callingPlayersCards;
+
+	private Messages callingPlayersMessages;
 
 	private Map<String, Integer> usedCards;
-	private Messages messages;
-
 	private int undisclosedCards;
 
 	public Card getCard(int no) {
@@ -56,71 +56,65 @@ public class SelectActionBean extends BaseAction {
 	}
 
 	private Resolution showGame(Game game) {
-		Player player = game.getPlayer(pid);
-		if (player.isDead()) {
-			return getPlayerDeadResolution();
-		} else {
-			return showPlayer(player);
-		}
+		Player callingPlayer = game.getPlayer(pid);
+		return showPlayer(callingPlayer);
 	}
 
-	private Resolution showPlayer(Player player) {
-		buildResponse(player);
-		if (isPlayersTurn(player)) {
+	private Resolution showPlayer(Player callingPlayer) {
+		buildResponse(callingPlayer);
+		if (isPlayersTurn(callingPlayer)) {
 			return getDisplayTurnResolution();
 		} else {
 			return getNoTurnResolution();
 		}
 	}
 
-	private Resolution getNoTurnResolution() {
-		return new ForwardResolution("/WEB-INF/jsp/noTurn.jsp");
+	private boolean isPlayersTurn(Player callingPlayer) {
+		return callingPlayer.isCurrentPlayer();
 	}
 
-	private boolean isPlayersTurn(Player player) {
-		return player.isCurrentPlayer();
+	private Resolution getNoTurnResolution() {
+		return new ForwardResolution("/WEB-INF/jsp/noTurn.jsp");
 	}
 
 	private Resolution getDisplayTurnResolution() {
 		return new ForwardResolution("/WEB-INF/jsp/select.jsp");
 	}
 
-	private Map<String, Integer> aggregateDataUsedCards(Game game) {
-		Map<String, Integer> map = new HashMap<>();
-		for (Card c : game.getStackOpen().getCards()) {
-			Integer i = map.get(c.getName());
-			if (i == null) {
-				i = 0;
-			}
-			map.put(c.getName(), i + 1);
-		}
-		return map;
-	}
-
-	private void buildResponse(Player player) {
-		Game game = player.getGame();
-		messages = player.getMessages();
-
-		undisclosedCards = game.getStackHidden().getCards().size();
-		usedCards = aggregateDataUsedCards(game);
-
-		currentPlayersCards = new ArrayList<>();
-		for (AssociatedCard card : player.getCardHand().getAssociatedCards()) {
-			currentPlayersCards.add(new CardWeb(card));
-		}
-
-		players = new ArrayList<>();
-		for (Player pla : game.getPlayers()) {
-			players.add(new PlayerWeb(pla));
-		}
-	}
-
-	private Resolution getPlayerDeadResolution() {
-		return new ForwardResolution("/WEB-INF/jsp/dead.jsp");
-	}
-
 	private Resolution getNoGameFoundResolution() {
 		return new RedirectResolution(LandingActionBean.class);
+	}
+
+	private void buildResponse(Player callingPlayer) {
+		Game game = callingPlayer.getGame();
+		buildMessages(callingPlayer);
+		buildCardStacks(game);
+		buildCallingPlayersCards(callingPlayer);
+		buildPlayerOverview(game);
+	}
+
+	private void buildPlayerOverview(Game game) {
+		players = new ArrayList<>();
+		for (Player player : game.getPlayers()) {
+			players.add(new PlayerWeb(player));
+		}
+	}
+
+	private void buildCallingPlayersCards(Player callingPlayer) {
+		callingPlayersCards = new ArrayList<>();
+		for (AssociatedCard card : callingPlayer.getCardHand().getAssociatedCards()) {
+			callingPlayersCards.add(new CardWeb(card));
+		}
+	}
+
+	private void buildCardStacks(Game game) {
+		undisclosedCards = game.getStackHidden().getCards().size();
+		PrinterGamePlan pgp = new PrinterGamePlan(game);
+		usedCards = pgp.aggregateDataUsedCards();
+	}
+
+	private void buildMessages(Player callingPlayer) {
+		callingPlayersMessages = callingPlayer.getMessages();
 	}
 
 	@AllArgsConstructor

@@ -5,45 +5,45 @@
 <s:layout-render name="/WEB-INF/jsp/common/main_layout.jsp">
 	<s:layout-component name="center">
 	
-	<h3>
-		Players:
-	</h3>
-	<c:forEach var="player" items="${actionBean.players }">
-		<li>${player.displayName } ${player.status }</li>
-	</c:forEach>
-
-	<h3>
-		Your cards:
-	</h3>
-	<table>
-		<tr>
-			<c:forEach var="card" items="${actionBean.currentPlayersCards }">
-				<td>${card.form }</td>
-			</c:forEach>
-		</tr>
-	</table>
-
-	<h3>
-		Stacks:
-	</h3> 
-	Undisclosed cards: ${actionBean.undisclosedCards }<br/>
-	Used cards: 
-	<c:forEach var="usedCard" items="${actionBean.usedCards }" varStatus="loopStatus">
-		${usedCard.key }(${usedCard.value }x)
-		<c:if test="${!loopStatus.last}">, </c:if>
-	</c:forEach>
-
-	<h3>
-		Last actions:
-	</h3>	
-	<ol>
-		${actionBean.messages.allHtml }
-	</ol> 
+		<h3>
+			Players:
+		</h3>
+		<c:forEach var="player" items="${actionBean.players }">
+			<li>${player.displayName } ${player.status }</li>
+		</c:forEach>
 	
+		<h3>
+			Your cards:
+		</h3>
+		<table>
+			<tr>
+				<c:forEach var="card" items="${actionBean.callingPlayersCards }">
+					<td>${card.form }</td>
+				</c:forEach>
+			</tr>
+		</table>
 	
-	<h3>Cards Help</h3>
+		<h3>
+			Stacks:
+		</h3> 
+		Undisclosed cards: ${actionBean.undisclosedCards }<br/>
+		Used cards: 
+		<c:forEach var="usedCard" items="${actionBean.usedCards }" varStatus="loopStatus">
+			${usedCard.key }(${usedCard.value }x)
+			<c:if test="${!loopStatus.last}">, </c:if>
+		</c:forEach>
+	
+		<h3>
+			Last actions:
+		</h3>	
+		<ol>
+			${actionBean.callingPlayersMessages.allHtml }
+		</ol> 
 		
-	<%@include file="/WEB-INF/jsp/common/card_overview.jsp"%>
+		
+		<h3>Cards Help</h3>
+			
+		<%@include file="/WEB-INF/jsp/common/card_overview.jsp"%>
 
 	
 	</s:layout-component>

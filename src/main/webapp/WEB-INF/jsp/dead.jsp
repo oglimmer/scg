@@ -10,6 +10,16 @@
 		<div>
 			${actionBean.response }
 		</div>
-
+	
+		<div style="margin-bottom:20px">
+		
+			<s:link beanclass="de.oglimmer.scg.web.action.SelectActionBean">
+				<s:param name="gid">${actionBean.gid}</s:param>
+				<s:param name="pid">${actionBean.pid}</s:param>
+				To overview page.
+			</s:link>
+		
+		</div>
+	
 	</s:layout-component>
 </s:layout-render>

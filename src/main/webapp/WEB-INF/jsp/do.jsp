@@ -18,7 +18,13 @@
 	</div>
 	
 	<div style="margin-bottom:20px">
-		<a href="Select.action?gid=${actionBean.gid}&pid=${actionBean.pid}">To overview page.</a>
+	
+		<s:link beanclass="de.oglimmer.scg.web.action.SelectActionBean">
+			<s:param name="gid">${actionBean.gid}</s:param>
+			<s:param name="pid">${actionBean.pid}</s:param>
+			To overview page.
+		</s:link>
+	
 	</div>
 	
 	
