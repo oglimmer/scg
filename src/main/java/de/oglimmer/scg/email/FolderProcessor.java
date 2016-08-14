@@ -8,7 +8,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import lombok.extern.slf4j.Slf4j;
-import de.oglimmer.scg.email.ImapProcessor.StoreManager;
+import de.oglimmer.scg.email.InboundProcessor.StoreManager;
 
 @Slf4j
 public class FolderProcessor {
@@ -29,7 +29,7 @@ public class FolderProcessor {
 	}
 
 	private Folder openInboxReadWrite() throws MessagingException {
-		Folder folder = storeManager.getStore().getFolder("INBOX");
+		Folder folder = storeManager.getFolder();
 		folder.open(Folder.READ_WRITE);
 		return folder;
 	}

@@ -17,29 +17,29 @@ import lombok.Synchronized;
 import de.oglimmer.scg.web.ScgProperties;
 
 /**
- * This class works beyond classloader boundaries. So only one instance of ImapProcessorManager in the JVM can be the
+ * This class works beyond classloader boundaries. So only one instance of InboundProcessorManager in the JVM can be the
  * master, all others (in other classloaders) are master=false
  * 
  * @author oli
  */
-public enum ImapProcessorObserver {
+public enum InboundProcessorObserver {
 	INSTANCE;
 
-	private static final String MBEAN_NAME = "de.oglimmer.scg:type=ImapProcessor";
+	private static final String MBEAN_NAME = "de.oglimmer.scg:type=InboundProcessor";
 
 	private boolean isThisClassLoaderMaster;
 	private Thread watchThread;
 	private MBeanCheck mbeanCheck = new MBeanCheck();
 
-	private ImapProcessorObserver() {
-		if (ScgProperties.INSTANCE.getImapEnabled()) {
+	private InboundProcessorObserver() {
+		if (ScgProperties.INSTANCE.getInboudEmailEnabled()) {
 			startWatchThread();
 		}
 	}
 
 	@Synchronized
 	private void startWatchThread() {
-		watchThread = new Thread(new WatcherThread(), "ImapProcessorObserver-" + Math.random());
+		watchThread = new Thread(new WatcherThread(), "InboudProcessorObserver-" + Math.random());
 		watchThread.start();
 	}
 
@@ -55,7 +55,7 @@ public enum ImapProcessorObserver {
 	public void stop() {
 		if (isThisClassLoaderMaster) {
 			mbeanCheck.unregisterMBean();
-			ImapProcessor.INSTANCE.stopThread();
+			InboundProcessor.INSTANCE.stopThread();
 		}
 		stopWatchThread();
 		TimeUnit.SECONDS.sleep(1);
@@ -135,7 +135,7 @@ public enum ImapProcessorObserver {
 		}
 
 		private void actAsMasterOnThisClassloader() {
-			ImapProcessor.INSTANCE.startThreadInitImap();
+			InboundProcessor.INSTANCE.startThreadInitInbound();
 			stopWatchThread();
 		}
 

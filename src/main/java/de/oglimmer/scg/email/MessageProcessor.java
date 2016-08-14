@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
-import de.oglimmer.scg.email.ImapProcessor.NoCarriageReturnException;
+import de.oglimmer.scg.email.InboundProcessor.NoCarriageReturnException;
 
 @Slf4j
 public class MessageProcessor {

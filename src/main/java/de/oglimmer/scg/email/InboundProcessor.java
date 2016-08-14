@@ -4,26 +4,28 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
+import de.oglimmer.scg.web.ScgProperties;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import de.oglimmer.scg.web.ScgProperties;
 
 @Slf4j
-public enum ImapProcessor {
+public enum InboundProcessor {
 	INSTANCE;
 
-	private StoreManager storeManager = new StoreManager();
+	private StoreManager storeManager = ScgProperties.INSTANCE.getMessageHandler().equalsIgnoreCase("mbox")
+			? new StoreManagerMbox() : new StoreManagerImap();
 
 	private Thread postboxWatchThread;
 
 	@SneakyThrows(value = { MessagingException.class })
-	public void startThreadInitImap() {
+	public void startThreadInitInbound() {
 		storeManager.openStore();
 		startThread();
 	}
@@ -52,7 +54,64 @@ public enum ImapProcessor {
 		}
 	}
 
-	class StoreManager {
+	interface StoreManager {
+
+		void openStore() throws MessagingException;
+
+		void openStoreNeverFail();
+
+		void closeStore();
+
+		Folder getFolder() throws MessagingException;
+
+	}
+
+	class StoreManagerMbox implements StoreManager {
+
+		private Session session;
+		@Getter
+		private Store store;
+
+		StoreManagerMbox() {
+			System.setProperty("mail.mbox.locktype", "java");
+			session = Session.getDefaultInstance(new Properties());
+		}
+
+		@Override
+		public void openStore() throws MessagingException {
+			closeStore();
+			store = session.getStore("mbox");
+			store.connect();
+		}
+
+		@Override
+		public void openStoreNeverFail() {
+			try {
+				openStore();
+			} catch (MessagingException e) {
+				log.error("Failed to open mbox-store", e);
+			}
+		}
+
+		@Override
+		public void closeStore() {
+			try {
+				if (store != null) {
+					store.close();
+				}
+			} catch (MessagingException e) {
+				log.error("Failed to close mbox-store", e);
+			}
+		}
+
+		@Override
+		public Folder getFolder() throws MessagingException {
+			return store.getFolder(ScgProperties.INSTANCE.getMboxFile());
+		}
+
+	}
+
+	class StoreManagerImap implements StoreManager {
 
 		private String host = ScgProperties.INSTANCE.getImapHost();
 		private String username = ScgProperties.INSTANCE.getImapUser();
@@ -62,17 +121,19 @@ public enum ImapProcessor {
 		@Getter
 		private Store store;
 
-		StoreManager() {
+		StoreManagerImap() {
 			initSession();
 		}
 
-		void openStore() throws MessagingException {
+		@Override
+		public void openStore() throws MessagingException {
 			closeStore();
 			store = session.getStore("imap");
 			store.connect(host, username, password);
 		}
 
-		void openStoreNeverFail() {
+		@Override
+		public void openStoreNeverFail() {
 			try {
 				openStore();
 			} catch (MessagingException e) {
@@ -80,7 +141,8 @@ public enum ImapProcessor {
 			}
 		}
 
-		void closeStore() {
+		@Override
+		public void closeStore() {
 			try {
 				if (store != null) {
 					store.close();
@@ -98,6 +160,11 @@ public enum ImapProcessor {
 				props.setProperty("mail.imap.socketFactory.port", "993");
 				session = Session.getInstance(props, null);
 			}
+		}
+
+		@Override
+		public Folder getFolder() throws MessagingException {
+			return store.getFolder("INBOX");
 		}
 	}
 

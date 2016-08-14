@@ -5,7 +5,7 @@ import javax.servlet.ServletContextListener;
 
 import lombok.Getter;
 import de.oglimmer.scg.email.EmailSender;
-import de.oglimmer.scg.email.ImapProcessorObserver;
+import de.oglimmer.scg.email.InboundProcessorObserver;
 
 public class ScgServletContextListener implements ServletContextListener {
 
@@ -16,13 +16,13 @@ public class ScgServletContextListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent sc) {
 		longVersion = new LongVersionBuilder().build(sc.getServletContext());
 		GameManager.INSTANCE.restoreSavedGames();
-		ImapProcessorObserver.INSTANCE.hashCode();
+		InboundProcessorObserver.INSTANCE.hashCode();
 		EmailSender.start();
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sc) {
-		ImapProcessorObserver.INSTANCE.stop();
+		InboundProcessorObserver.INSTANCE.stop();
 		EmailSender.close();
 	}
 

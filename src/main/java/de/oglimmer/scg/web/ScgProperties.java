@@ -65,8 +65,8 @@ public enum ScgProperties {
 		return Boolean.parseBoolean(prop.getProperty("smtp.enabled", "FALSE"));
 	}
 
-	public boolean getImapEnabled() {
-		return Boolean.parseBoolean(prop.getProperty("imap.enabled", "FALSE"));
+	public boolean getInboudEmailEnabled() {
+		return Boolean.parseBoolean(prop.getProperty("inbound.enabled", "FALSE"));
 	}
 
 	public String getSmtpFrom() {
@@ -103,6 +103,14 @@ public enum ScgProperties {
 
 	public String getTheme() {
 		return prop.getProperty("theme", null);
+	}
+
+	public String getMessageHandler() {
+		return prop.getProperty("message.handler", "mbox");
+	}
+
+	public String getMboxFile() {
+		return prop.getProperty("mbox.file", null);
 	}
 
 }
