@@ -7,7 +7,7 @@
 	</appender>
 
  	
-	<logger name="de.oglimmer" level="debug">	
+	<logger name="de.oglimmer" level="info">	
 	</logger>
 	
 
