@@ -28,7 +28,7 @@ public enum InboundProcessorObserver {
 	private static final String MBEAN_NAME = "de.oglimmer.scg:type=InboundProcessor";
 
 	private boolean isThisClassLoaderMaster;
-	private Thread watchThread;
+	private volatile Thread watchThread;
 	private MBeanCheck mbeanCheck = new MBeanCheck();
 
 	private InboundProcessorObserver() {
@@ -109,14 +109,7 @@ public enum InboundProcessorObserver {
 		void unregisterMBean() {
 			mbeanServer.unregisterMBean(objectName);
 		}
-
-		interface IDummy {
-			// no code
-		}
-
-		class DummyCls implements IDummy {
-			// no code
-		}
+		
 	}
 
 	/**

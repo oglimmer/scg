@@ -8,30 +8,17 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import lombok.extern.slf4j.Slf4j;
-import de.oglimmer.scg.email.InboundProcessor.StoreManager;
 
 @Slf4j
 public class FolderProcessor {
 
 	private MessageProcessor messageProcessor = new MessageProcessor();
 
-	private StoreManager storeManager;
-
-	public FolderProcessor(StoreManager storeManager) {
-		this.storeManager = storeManager;
-	}
-
-	void processInbox() throws MessagingException, IOException {
-		Folder folder = openInboxReadWrite();
+	void processInbox(Folder folder) throws MessagingException, IOException {
+		folder.open(Folder.READ_WRITE);
 		Message[] message = getMessages(folder);
 		processMessages(message);
 		folder.expunge();
-	}
-
-	private Folder openInboxReadWrite() throws MessagingException {
-		Folder folder = storeManager.getFolder();
-		folder.open(Folder.READ_WRITE);
-		return folder;
 	}
 
 	private Message[] getMessages(Folder folder) throws MessagingException {

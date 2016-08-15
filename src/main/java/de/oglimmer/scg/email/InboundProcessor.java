@@ -16,13 +16,26 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public enum InboundProcessor {
-	INSTANCE;
+public class InboundProcessor {
+	public static final InboundProcessor INSTANCE = new InboundProcessor();
 
-	private StoreManager storeManager = ScgProperties.INSTANCE.getMessageHandler().equalsIgnoreCase("mbox")
-			? new StoreManagerMbox() : new StoreManagerImap();
+	private StoreManager storeManager;
 
-	private Thread postboxWatchThread;
+	private volatile Thread postboxWatchThread;
+
+	private InboundProcessor() {
+		switch (ScgProperties.INSTANCE.getMessageHandler()) {
+		case "mbox":
+			storeManager = new StoreManagerMbox();
+			break;
+		case "imap":
+			storeManager = new StoreManagerImap();
+			break;
+		default:
+			throw new RuntimeException("Unsupported messsageHandler : " + ScgProperties.INSTANCE.getMessageHandler());
+		}
+		log.debug("InboundProcessor uses {}", storeManager.getClass().getName());
+	}
 
 	@SneakyThrows(value = { MessagingException.class })
 	public void startThreadInitInbound() {
@@ -64,6 +77,7 @@ public enum InboundProcessor {
 
 		Folder getFolder() throws MessagingException;
 
+		void ensureConnectionFreshness() throws MessagingException;
 	}
 
 	class StoreManagerMbox implements StoreManager {
@@ -106,7 +120,13 @@ public enum InboundProcessor {
 
 		@Override
 		public Folder getFolder() throws MessagingException {
+			log.debug("Using mbox file at {}", ScgProperties.INSTANCE.getMboxFile());
 			return store.getFolder(ScgProperties.INSTANCE.getMboxFile());
+		}
+
+		@Override
+		public void ensureConnectionFreshness() throws MessagingException {
+
 		}
 
 	}
@@ -120,6 +140,8 @@ public enum InboundProcessor {
 		private Session session;
 		@Getter
 		private Store store;
+
+		private int counter = 0;
 
 		StoreManagerImap() {
 			initSession();
@@ -166,11 +188,24 @@ public enum InboundProcessor {
 		public Folder getFolder() throws MessagingException {
 			return store.getFolder("INBOX");
 		}
+
+		/**
+		 * gmail allows only 10 getFolders(), then you have to re-open the store
+		 * 
+		 * @throws MessagingException
+		 */
+		@Override
+		public void ensureConnectionFreshness() throws MessagingException {
+			if (counter++ == 10) {
+				counter = 0;
+				storeManager.openStore();
+			}
+		}
 	}
 
 	class PostboxWatcher implements Runnable {
-		private int counter = 0;
-		private FolderProcessor folderProcessor = new FolderProcessor(storeManager);
+
+		private FolderProcessor folderProcessor = new FolderProcessor();
 
 		public void run() {
 			log.info("ImapProcessor started");
@@ -190,8 +225,8 @@ public enum InboundProcessor {
 		}
 
 		private void processLoopRun() throws MessagingException, IOException {
-			ensureConnectionFreshness();
-			folderProcessor.processInbox();
+			storeManager.ensureConnectionFreshness();
+			folderProcessor.processInbox(storeManager.getFolder());
 			sleep();
 		}
 
@@ -199,18 +234,6 @@ public enum InboundProcessor {
 			log.error("Failed to process imap", e);
 			storeManager.openStoreNeverFail();
 			sleep();
-		}
-
-		/**
-		 * gmail allows only 15 getFolders(), then you have to re-open the store
-		 * 
-		 * @throws MessagingException
-		 */
-		private void ensureConnectionFreshness() throws MessagingException {
-			if (counter++ == 10) {
-				counter = 0;
-				storeManager.openStore();
-			}
 		}
 
 	}

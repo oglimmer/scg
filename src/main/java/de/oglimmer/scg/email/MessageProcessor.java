@@ -103,7 +103,7 @@ public class MessageProcessor {
 	}
 
 	private String getGameId(String text) {
-		String gameId = text.substring(text.indexOf(GAME_START) + PLAYER_START.length(), text.indexOf(GAME_END));
+		String gameId = text.substring(text.indexOf(GAME_START) + GAME_START.length(), text.indexOf(GAME_END));
 		return gameId;
 	}
 
