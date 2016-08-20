@@ -72,9 +72,10 @@
 					<archiveClasses>true</archiveClasses>
 					<archive>
 						<manifestEntries>
-							<SVN-Revision-No>${buildNumber}</SVN-Revision-No>
-							<Creation-Date>${timestamp}</Creation-Date>
-							<SCG-Version>${project.version}</SCG-Version>
+							<git-commit>${buildNumber}</git-commit>
+							<git-url>${project.scm.url}</git-url>
+							<creation-date>${timestamp}</creation-date>
+							<project-version>${project.version}</project-version>
 						</manifestEntries>
 					</archive>
 				</configuration>
@@ -97,14 +98,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.5</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.0.13</version>
+			<groupId>de.oglimmer</groupId>
+			<artifactId>utils</artifactId>
+			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.stripes</groupId>

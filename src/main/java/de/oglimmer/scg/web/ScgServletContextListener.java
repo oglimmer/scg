@@ -3,9 +3,10 @@ package de.oglimmer.scg.web;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import lombok.Getter;
 import de.oglimmer.scg.email.EmailSender;
 import de.oglimmer.scg.email.InboundProcessorObserver;
+import de.oglimmer.utils.VersionFromManifest;
+import lombok.Getter;
 
 public class ScgServletContextListener implements ServletContextListener {
 
@@ -14,7 +15,9 @@ public class ScgServletContextListener implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sc) {
-		longVersion = new LongVersionBuilder().build(sc.getServletContext());
+		VersionFromManifest vfm = new VersionFromManifest();
+		vfm.initFromFile(sc.getServletContext().getRealPath("/META-INF/MANIFEST.MF"));
+		longVersion = vfm.getLongVersion();
 		GameManager.INSTANCE.restoreSavedGames();
 		InboundProcessorObserver.INSTANCE.hashCode();
 		EmailSender.start();
