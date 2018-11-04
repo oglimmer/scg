@@ -1,7 +1,7 @@
 package de.oglimmer.scg.generic;
 
 import lombok.Value;
-import lombok.experimental.Builder;
+import lombok.Builder;
 
 @Value
 @Builder
