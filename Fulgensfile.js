@@ -9,14 +9,26 @@ module.exports = {
     },
   },
 
+  versions: {
+    scg: {
+      TestedWith: "3-jre-11"
+    },
+    tomcat: {
+      Docker: "tomcat9-openjdk11-openj9",
+      TestedWith: "7 & 9"
+    }
+  },
+
   software: {
-    "scg": {
+    scg: {
       Source: "mvn",      
       Artifact: "target/scg##001.war"
     },
 
-    "tomcat": {
+    tomcat: {
       Source: "tomcat",
+      DockerImage: "oglimmer/adoptopenjdk-tomcat",
+      DockerMemory: "70M",
       Deploy: "scg"
     }
   }
