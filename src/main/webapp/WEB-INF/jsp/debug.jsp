@@ -9,7 +9,10 @@
 	<s:layout-component name="center">
 
 		<c:forEach var="game" items="${actionBean.gameManager.allGames }">
+			<%--
 			${fn:replace(game.debugPrint(), newLineChar, '<br/>')}
+			--%>
+			${game.id }
 			<s:link beanclass="de.oglimmer.scg.web.action.DebugActionBean"
 				event="delete">
 				<s:param name="gameId">${game.id }</s:param>
