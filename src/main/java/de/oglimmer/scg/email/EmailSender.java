@@ -146,8 +146,10 @@ public class EmailSender {
 			throws UnsupportedEncodingException, EmailException {
 		simpleEmail.setHostName(ScgProperties.INSTANCE.getSmtpHost());
 		simpleEmail.setSmtpPort(ScgProperties.INSTANCE.getSmtpPort());
-		simpleEmail.setAuthenticator(new DefaultAuthenticator(ScgProperties.INSTANCE.getSmtpUser(),
+		if (ScgProperties.INSTANCE.getSmtpUser() != null && !ScgProperties.INSTANCE.getSmtpUser().equals("")) {
+			simpleEmail.setAuthenticator(new DefaultAuthenticator(ScgProperties.INSTANCE.getSmtpUser(),
 				ScgProperties.INSTANCE.getSmtpPassword()));
+		}
 		simpleEmail.setSSLOnConnect(ScgProperties.INSTANCE.getSmtpSSL());
 
 		Collection<InternetAddress> col = new ArrayList<>();
