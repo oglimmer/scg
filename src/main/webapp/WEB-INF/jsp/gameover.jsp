@@ -5,16 +5,18 @@
 <s:layout-render name="/WEB-INF/jsp/common/main_layout.jsp">
 	<s:layout-component name="center">
 
-		<div style="margin-bottom:20px">The has ended. See your inbox for the result.</div>
-		
-		<div style="margin-bottom:20px">
-		
-			<s:link beanclass="de.oglimmer.scg.web.action.SelectActionBean">
-				<s:param name="gid">${actionBean.gid}</s:param>
-				<s:param name="pid">${actionBean.pid}</s:param>
-				To overview page.
-			</s:link>
-		
+		<div class="panel">
+			<div class="status-message status-gameover">
+				<h2>Game Over</h2>
+				<p>The game has ended. Check your inbox for the result.</p>
+				<div class="mt-2">
+					<s:link beanclass="de.oglimmer.scg.web.action.SelectActionBean" class="btn btn-secondary">
+						<s:param name="gid">${actionBean.gid}</s:param>
+						<s:param name="pid">${actionBean.pid}</s:param>
+						View Game Overview
+					</s:link>
+				</div>
+			</div>
 		</div>
 
 	</s:layout-component>

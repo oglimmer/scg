@@ -2,28 +2,34 @@
 <%@ taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <s:layout-definition>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
 <meta charset="utf-8" />
-<title></title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SCG — Simple Card Game</title>
 <link rel="stylesheet" type="text/css" href="css/styles.css" />
-<link rel="stylesheet" type="text/css" href="css/redmond/jquery-ui-1.10.3.custom.min.css" />
 <script src="js/cookie.js"></script>
 <script src="js/jquery-2.0.3.js"></script>
-<script src="js/jquery-ui-1.10.3.custom.min.js"></script>
 </head>
 <body>
-	<div class="head">
-		<h1>Welcome to SCG</h1>		
-	</div>
+	<header class="site-header">
+		<div class="site-logo">
+			<div class="site-logo-icon">&#9824;</div>
+			<div class="site-logo-text"><span>SCG</span> Card Game</div>
+		</div>
+		<nav class="site-nav">
+			<a href="Landing.action">Rules</a>
+			<a href="CreateGame.action">New Game</a>
+		</nav>
+	</header>
 
-	<div class="center" style="${style}">
+	<main class="main-content">
 		<s:layout-component name="center"/>
-	</div>
-	
-	<div class="footer">
-		${actionBean.longVersion } - Created by oglimmer.de &nbsp;
-	</div>
+	</main>
+
+	<footer class="site-footer">
+		${actionBean.longVersion } &mdash; oglimmer.de
+	</footer>
 </body>
 </html>
 </s:layout-definition>

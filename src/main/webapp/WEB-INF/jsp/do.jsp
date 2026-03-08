@@ -4,29 +4,21 @@
 
 <s:layout-render name="/WEB-INF/jsp/common/main_layout.jsp">
 	<s:layout-component name="center">
-	
-	<div style="margin-bottom:20px">
-		Turn accepted.
-	</div>
-	
-	<div style="margin-bottom:20px">
-		${actionBean.response }
-	</div>
 
-	<div style="margin-bottom:20px">
-		Next email sent.
-	</div>
-	
-	<div style="margin-bottom:20px">
-	
-		<s:link beanclass="de.oglimmer.scg.web.action.SelectActionBean">
-			<s:param name="gid">${actionBean.gid}</s:param>
-			<s:param name="pid">${actionBean.pid}</s:param>
-			To overview page.
-		</s:link>
-	
-	</div>
-	
-	
+		<div class="panel">
+			<div class="status-message status-success">
+				<h2>Turn Accepted</h2>
+				<p>${actionBean.response}</p>
+				<p class="text-muted">Next email sent.</p>
+				<div class="mt-2">
+					<s:link beanclass="de.oglimmer.scg.web.action.SelectActionBean" class="btn btn-secondary">
+						<s:param name="gid">${actionBean.gid}</s:param>
+						<s:param name="pid">${actionBean.pid}</s:param>
+						View Game Overview
+					</s:link>
+				</div>
+			</div>
+		</div>
+
 	</s:layout-component>
 </s:layout-render>
